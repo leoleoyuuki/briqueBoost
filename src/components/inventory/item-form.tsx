@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth, useFirestore, addDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
+import { useUser, useFirestore, addDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
 import { collection, doc, serverTimestamp } from 'firebase/firestore';
 import type { Item, WithId } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -33,7 +33,7 @@ interface ItemFormProps {
 
 export function ItemForm({ item }: ItemFormProps) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isUserLoading: isAuthLoading } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
 
@@ -171,7 +171,7 @@ export function ItemForm({ item }: ItemFormProps) {
           <Link href={item ? `/inventory/${item.id}` : '/dashboard'} passHref>
             <Button variant="outline" type="button">Cancelar</Button>
           </Link>
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading || isAuthLoading}>
             {isLoading ? (item ? 'Salvando...' : 'Adicionando...') : (item ? 'Salvar Alterações' : 'Adicionar Item')}
           </Button>
         </CardFooter>
