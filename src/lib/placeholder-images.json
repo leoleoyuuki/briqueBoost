@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "jacket-1",
+      "description": "A person wearing a vintage leather jacket.",
+      "imageUrl": "https://images.unsplash.com/photo-1578198576866-7e0ba6078128?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxsZWF0aGVyJTIwamFja2V0fGVufDB8fHx8MTc3MDYxNTg4OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leather jacket"
+    },
+    {
+      "id": "console-1",
+      "description": "A retro gaming console on a desk.",
+      "imageUrl": "https://images.unsplash.com/photo-1486401899868-0e435ed85128?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxnYW1pbmclMjBjb25zb2xlfGVufDB8fHx8MTc3MDYyMDMyN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gaming console"
+    },
+    {
+      "id": "chair-1",
+      "description": "A modern ergonomic office chair.",
+      "imageUrl": "https://images.unsplash.com/photo-1541558869434-2840d308329a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxvZmZpY2UlMjBjaGFpcnxlbnwwfHx8fDE3NzA2NTQwNzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "office chair"
+    },
+    {
+      "id": "bike-1",
+      "description": "A vintage racing bicycle leaning against a wall.",
+      "imageUrl": "https://images.unsplash.com/photo-1729983164023-f1a38288e891?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cmFjaW5nJTIwYmljeWNsZXxlbnwwfHx8fDE3NzA2NTg0MDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "racing bicycle"
+    },
+    {
+      "id": "user-avatar-1",
+      "description": "A portrait of a person.",
+      "imageUrl": "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzA1ODUyMzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    }
+  ]
 }

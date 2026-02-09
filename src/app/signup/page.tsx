@@ -1,7 +1,7 @@
-import { LoginForm } from "@/components/auth/login-form";
+import { SignupForm } from "@/components/auth/signup-form";
 import { Logo } from "@/components/logo";
 
-export default function LoginPage() {
+export default function SignupPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
@@ -11,10 +11,10 @@ export default function LoginPage() {
             BriqueBoost
           </h1>
           <p className="mt-2 text-center text-muted-foreground">
-            Aumente seus lucros. Simplifique suas vendas.
+            Crie sua conta e comece a lucrar hoje mesmo.
           </p>
         </div>
-        <LoginForm />
+        <SignupForm />
       </div>
     </div>
   );
