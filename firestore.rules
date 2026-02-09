@@ -1,0 +1,169 @@
+/**
+ * Core Philosophy: This ruleset implements a strict user-ownership security model.
+ * All data is considered private and is only accessible by the user who created it.
+ * There is no public or shared data in this model.
+ *
+ * Data Structure: The entire data model is hierarchical, with all user-specific
+ * collections nested under the /users/{userId} path. This structure naturally
+ * isolates each user's data, making security rules simple, performant, and easy to audit.
+ *
+ * Key Security Decisions:
+ * - Default Deny: All operations are denied by default. Access is only granted through explicit `allow` statements.
+ * - User Data Isolation: Users can only read or write documents within their own data tree (i.e., paths starting with /users/{their_own_uid}).
+ * - No User Enumeration: Listing documents from the top-level `/users` collection is explicitly forbidden to prevent attackers from discovering all user profiles.
+ *
+ * Denormalization for Authorization: The data structure is inherently optimized for
+ * authorization. By placing all data under a user-specific path `/users/{userId}`,
+ * ownership can be verified simply by checking the path parameter against the
+ * authenticated user's ID. This avoids slow and costly `get()` calls to other documents.
+ * Additionally, relational IDs (e.g., `userId`, `itemId`) are stored within documents
+ * to enforce data integrity during creation and prevent re-parenting during updates.
+ *
+ * Structural Segregation: The design uses structural segregation by default. All
+ * user data is confined to private subcollections, cleanly separating it from any
+ * potential future public or admin collections. This ensures that list operations
+ * on user data are always securely scoped to the authenticated user.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------------
+    // Helper Functions
+    // ----------------------------------------------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user is the owner of the resource
+     * based on the userId provided in the document path.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if the user is the owner AND the document already exists.
+     * Used for safe update and delete operations.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * Enforces that a specific field is immutable and cannot be changed during an update.
+     */
+    function isImmutable(field) {
+      return request.resource.data[field] == resource.data[field];
+    }
+
+    /**
+     * On create, validates that the User document's internal 'id' field
+     * matches the document's ID in the path.
+     */
+    function hasValidUserData(userId) {
+      return request.resource.data.id == userId;
+    }
+    
+    /**
+     * On create, validates that the Item document's internal 'userId' and 'id' fields
+     * match the IDs in the document's path.
+     */
+    function hasValidItemData(userId, itemId) {
+      return request.resource.data.userId == userId && request.resource.data.id == itemId;
+    }
+    
+    /**
+     * On create, validates that the Listing document's internal 'itemId' and 'id' fields
+     * match the IDs in the document's path.
+     */
+    function hasValidListingData(itemId, listingId) {
+      return request.resource.data.itemId == itemId && request.resource.data.id == listingId;
+    }
+
+    /**
+     * On create, validates that the Sale document's internal 'listingId' and 'id' fields
+     * match the IDs in the document's path.
+     */
+    function hasValidSaleData(listingId, saleId) {
+      return request.resource.data.listingId == listingId && request.resource.data.id == saleId;
+    }
+
+    // ----------------------------------------------------------------------
+    // Collection Rules
+    // ----------------------------------------------------------------------
+
+    /**
+     * @description Manages user profile documents.
+     * @path /users/{userId}
+     * @allow (create) A new user with UID 'user_abc' creates their own profile at '/users/user_abc'.
+     * @allow (get) An authenticated user 'user_abc' reads their own profile.
+     * @deny (create) An authenticated user 'user_abc' tries to create a profile at '/users/user_xyz'.
+     * @deny (list) Any user, authenticated or not, tries to list all documents in the '/users' collection.
+     * @principle Restricts access to a user's own data tree and allows self-creation of a profile.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Security: Prevent user enumeration.
+      allow create: if isOwner(userId) && hasValidUserData(userId);
+      allow update: if isExistingOwner(userId) && isImmutable('id');
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Manages items owned by a user.
+       * @path /users/{userId}/items/{itemId}
+       * @allow (create) User 'user_abc' creates a new item at '/users/user_abc/items/item_123'.
+       * @allow (list) User 'user_abc' lists all of their own items.
+       * @deny (get) User 'user_xyz' attempts to read an item from '/users/user_abc/items/item_123'.
+       * @deny (update) User 'user_abc' attempts to change the 'userId' of an existing item.
+       * @principle Enforces strict data ownership within a user's private subcollection.
+       */
+      match /items/{itemId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && hasValidItemData(userId, itemId);
+        allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
+        allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Manages listings for a specific user-owned item.
+         * @path /users/{userId}/items/{itemId}/listings/{listingId}
+         * @allow (create) User 'user_abc' creates a new listing for their item at '/users/user_abc/items/item_123/listings/listing_456'.
+         * @allow (list) User 'user_abc' lists all listings for their own item.
+         * @deny (get) User 'user_xyz' attempts to read a listing from user 'user_abc'.
+         * @deny (update) User 'user_abc' attempts to change the 'itemId' of an existing listing, which would break relational integrity.
+         * @principle Inherits ownership from parent path and validates relational integrity on create/update.
+         */
+        match /listings/{listingId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && hasValidListingData(itemId, listingId);
+          allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('itemId');
+          allow delete: if isExistingOwner(userId);
+          
+          /**
+           * @description Manages sales records for a specific user-owned listing.
+           * @path /users/{userId}/items/{itemId}/listings/{listingId}/sales/{saleId}
+           * @allow (create) User 'user_abc' creates a new sales record for their listing.
+           * @allow (get) User 'user_abc' reads a sales record for their own listing.
+           * @deny (list) User 'user_xyz' attempts to list sales records from user 'user_abc'.
+           * @deny (delete) User 'user_xyz' attempts to delete a sales record belonging to user 'user_abc'.
+           * @principle Enforces strict ownership at the deepest level of the data hierarchy.
+           */
+          match /sales/{saleId} {
+            allow get: if isOwner(userId);
+            allow list: if isOwner(userId);
+            allow create: if isOwner(userId) && hasValidSaleData(listingId, saleId);
+            allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('listingId');
+            allow delete: if isExistingOwner(userId);
+          }
+        }
+      }
+    }
+  }
+}

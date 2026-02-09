@@ -1,0 +1,266 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the BriqueBoost application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "username": {
+          "type": "string",
+          "description": "User's username."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "username",
+        "createdAt"
+      ]
+    },
+    "Item": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Item",
+      "type": "object",
+      "description": "Represents an item that a user has purchased for resale.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the item."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who owns this item. (Relationship: User 1:N Item)"
+        },
+        "purchasePrice": {
+          "type": "number",
+          "description": "The price the user paid for the item."
+        },
+        "purchaseDate": {
+          "type": "string",
+          "description": "The date the user purchased the item.",
+          "format": "date-time"
+        },
+        "condition": {
+          "type": "string",
+          "description": "The condition of the item when purchased."
+        },
+        "source": {
+          "type": "string",
+          "description": "The source from which the item was purchased (e.g., thrift store, online marketplace)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any additional notes about the item."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "purchasePrice",
+        "purchaseDate",
+        "condition",
+        "source"
+      ]
+    },
+    "Listing": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Listing",
+      "type": "object",
+      "description": "Represents an enhanced product listing for an item.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the listing."
+        },
+        "itemId": {
+          "type": "string",
+          "description": "Reference to the Item this listing is for. (Relationship: Item 1:1 Listing)"
+        },
+        "title": {
+          "type": "string",
+          "description": "The enhanced title generated for the item."
+        },
+        "description": {
+          "type": "string",
+          "description": "The enhanced description generated for the item."
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "The AI's reasoning for the generated title and description."
+        },
+        "listingPrice": {
+          "type": "number",
+          "description": "The price at which the item is listed for sale."
+        },
+        "platform": {
+          "type": "string",
+          "description": "The sales platform the item is listed on (e.g., eBay, Etsy)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the listing (e.g., active, sold, draft)."
+        }
+      },
+      "required": [
+        "id",
+        "itemId",
+        "title",
+        "description",
+        "reasoning",
+        "listingPrice",
+        "platform",
+        "status"
+      ]
+    },
+    "Sale": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Sale",
+      "type": "object",
+      "description": "Represents a sale of an item.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the sale."
+        },
+        "listingId": {
+          "type": "string",
+          "description": "Reference to the Listing that was sold. (Relationship: Listing 1:1 Sale)"
+        },
+        "salePrice": {
+          "type": "number",
+          "description": "The price at which the item was sold."
+        },
+        "saleDate": {
+          "type": "string",
+          "description": "The date the item was sold.",
+          "format": "date-time"
+        },
+        "profit": {
+          "type": "number",
+          "description": "The profit made from the sale (salePrice - purchasePrice)."
+        }
+      },
+      "required": [
+        "id",
+        "listingId",
+        "salePrice",
+        "saleDate",
+        "profit"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles.  Path-based ownership enforced.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/items/{itemId}",
+        "definition": {
+          "entityName": "Item",
+          "schema": {
+            "$ref": "#/backend/entities/Item"
+          },
+          "description": "Stores items owned by a specific user. Path-based ownership; enforces that only the user can manage these items.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "itemId",
+              "description": "The unique identifier for the item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/items/{itemId}/listings/{listingId}",
+        "definition": {
+          "entityName": "Listing",
+          "schema": {
+            "$ref": "#/backend/entities/Listing"
+          },
+          "description": "Stores listings associated with an item owned by a specific user. Path-based ownership ensures only the owning user can manage listings for their items.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "itemId",
+              "description": "The unique identifier for the item."
+            },
+            {
+              "name": "listingId",
+              "description": "The unique identifier for the listing."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/items/{itemId}/listings/{listingId}/sales/{saleId}",
+        "definition": {
+          "entityName": "Sale",
+          "schema": {
+            "$ref": "#/backend/entities/Sale"
+          },
+          "description": "Stores sales records for a listing associated with an item owned by a specific user. Path-based ownership, ensuring only the owning user can manage sales records.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "itemId",
+              "description": "The unique identifier for the item."
+            },
+            {
+              "name": "listingId",
+              "description": "The unique identifier for the listing."
+            },
+            {
+              "name": "saleId",
+              "description": "The unique identifier for the sale."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to securely manage user data, items, listings, and sales for the BriqueBoost application. It prioritizes Authorization Independence by using path-based ownership for private user data and avoids hierarchical `get()` calls in security rules. Segregation is achieved by storing user-specific data under `/users/{userId}` paths, ensuring homogeneous security requirements within each collection.  This design facilitates straightforward and robust security rules while supporting atomic operations. Path-based ownership (`/users/{userId}/items/{itemId}`) enables efficient and secure `list` operations for user-owned data, addressing the QAPs requirement."
+  }
+}
