@@ -57,7 +57,16 @@ export function StatCards({ stats }: StatCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {cardData.map((card) => (
-        <Card key={card.title} className="bg-card/60 dark:bg-card/20 backdrop-blur-lg border-border/30 shadow-lg shadow-black/5 transition-all duration-300 hover:shadow-primary/10 hover:border-primary/30">
+        <Card 
+            key={card.title} 
+            className="
+              border-border bg-card/50 
+              dark:bg-card/50 backdrop-blur-lg 
+              shadow-lg shadow-black/5 
+              transition-all duration-300
+              hover:border-primary/30 hover:shadow-primary/10
+            "
+          >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
             <card.icon className="h-4 w-4 text-muted-foreground" />
