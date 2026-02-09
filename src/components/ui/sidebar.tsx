@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent, SheetTrigger as SheetPrimitiveTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -203,23 +203,21 @@ const SidebarTrigger = React.forwardRef<
   const { toggleSidebar } = useSidebar()
 
   return (
-    <SheetPrimitiveTrigger asChild>
-        <Button
-            ref={ref}
-            data-sidebar="trigger"
-            variant="ghost"
-            size="icon"
-            className={cn("h-9 w-9", className)}
-            onClick={(event) => {
-                onClick?.(event)
-                toggleSidebar()
-            }}
-            {...props}
-            >
-            <PanelLeft />
-            <span className="sr-only">Toggle Sidebar</span>
-        </Button>
-    </SheetPrimitiveTrigger>
+    <Button
+        ref={ref}
+        data-sidebar="trigger"
+        variant="ghost"
+        size="icon"
+        className={cn("h-9 w-9", className)}
+        onClick={(event) => {
+            onClick?.(event)
+            toggleSidebar()
+        }}
+        {...props}
+        >
+        <PanelLeft />
+        <span className="sr-only">Toggle Sidebar</span>
+    </Button>
   )
 })
 SidebarTrigger.displayName = "SidebarTrigger"
