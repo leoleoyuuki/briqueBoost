@@ -66,8 +66,8 @@ export function StatCards({ stats }: StatCardsProps) {
   };
 
   return (
-    <Card>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border">
+    <Card className="bg-card/50 backdrop-blur-md border-white/10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border/50">
             {cardData.map((card) => (
                 <div key={card.title} className="p-6">
                     <h3 className="text-sm font-medium text-muted-foreground">{card.title}</h3>
