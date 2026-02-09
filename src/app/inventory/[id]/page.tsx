@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound, useRouter, useParams } from 'next/navigation';
 import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import type { Item } from '@/lib/types';
@@ -9,7 +9,8 @@ import { AdEnhancer } from '@/components/inventory/ad-enhancer';
 import { ItemDetails } from '@/components/inventory/item-details';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function ItemDetailPage({ params }: { params: { id: string } }) {
+export default function ItemDetailPage() {
+  const params = useParams<{ id: string }>();
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
