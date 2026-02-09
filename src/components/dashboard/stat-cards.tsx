@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DollarSign, Package, TrendingUp, ShoppingBag, type LucideIcon } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type StatCardsProps = {
@@ -15,80 +15,71 @@ type StatCardsProps = {
 
 interface CardData {
   title: string;
-  icon: LucideIcon;
   value: string | number;
-  description: string;
-  isPrimary?: boolean;
 }
 
 export function StatCards({ stats }: StatCardsProps) {
   const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  };
-
-  const formatPercent = (value: number) => {
-    // Placeholder for change, since we don't have historical data
-    const mockChange = (Math.random() * 10 - 2).toFixed(2);
-    const isPositive = parseFloat(mockChange) >= 0;
-    return (
-        <span className={cn('text-xs font-medium', isPositive ? 'text-emerald-500' : 'text-red-500')}>
-            {isPositive ? '+' : ''}{mockChange}%
-        </span>
-    );
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 });
   };
 
   const cardData: CardData[] = [
     {
       title: "Lucro Total",
-      icon: DollarSign,
       value: formatCurrency(stats.totalProfit),
-      description: "Comparado ao mês passado",
-      isPrimary: true,
     },
     {
       title: "Itens Vendidos",
-      icon: ShoppingBag,
-      value: `+${stats.totalItemsSold}`,
-      description: "Comparado ao mês passado",
+      value: stats.totalItemsSold,
     },
     {
       title: "Itens em Estoque",
-      icon: Package,
       value: stats.itemsInStock,
-      description: "Itens disponíveis para venda",
     },
     {
       title: "Margem Média",
-      icon: TrendingUp,
       value: `${(stats.averageProfitMargin * 100).toFixed(1)}%`,
-      description: "Comparado ao mês passado",
     },
   ];
 
+  const renderPercentageChange = () => {
+    // This is a placeholder as we don't have historical data to compare.
+    const mockChange = (Math.random() * 20 - 5).toFixed(2);
+    const isPositive = parseFloat(mockChange) >= 0;
+    
+    return (
+        <div className={cn(
+            "flex items-center gap-1.5 text-xs font-medium",
+            isPositive ? "text-emerald-500" : "text-red-500"
+        )}>
+            <span className={cn(
+                "flex h-4 w-4 items-center justify-center rounded-full",
+                isPositive ? "bg-emerald-500/20 text-emerald-500" : "bg-red-500/20 text-red-500"
+            )}>
+                {isPositive ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+            </span>
+            <span>
+                {isPositive ? '+' : ''}{mockChange}%
+            </span>
+        </div>
+    );
+  };
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {cardData.map((card) => (
-        <Card 
-            key={card.title} 
-            className={cn(
-                'bg-card text-card-foreground shadow-sm', 
-                card.isPrimary && 'bg-gradient-to-br from-purple-600 to-violet-800 text-white'
-            )}
-        >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className={cn("text-sm font-medium", card.isPrimary ? 'text-white/80' : 'text-muted-foreground')}>{card.title}</CardTitle>
-                <card.icon className={cn("h-5 w-5", card.isPrimary ? 'text-white/80' : 'text-muted-foreground')} />
-            </CardHeader>
-            <CardContent>
-                <div className="text-3xl font-bold">{card.value}</div>
-                <div className="flex items-center gap-2 text-xs">
-                    {!card.isPrimary && formatPercent(0)}
-                    <p className={cn("text-xs", card.isPrimary ? 'text-white/80' : 'text-muted-foreground')}>{card.description}</p>
+    <Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border">
+            {cardData.map((card) => (
+                <div key={card.title} className="p-6">
+                    <h3 className="text-sm font-medium text-muted-foreground">{card.title}</h3>
+                    <div className="mt-2 text-3xl font-bold text-foreground">
+                        {card.value}
+                    </div>
+                    <div className="mt-2">
+                        {renderPercentageChange()}
+                    </div>
                 </div>
-            </CardContent>
-        </Card>
-      ))}
-    </div>
+            ))}
+        </div>
+    </Card>
   );
 }
