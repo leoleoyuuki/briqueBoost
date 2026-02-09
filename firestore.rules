@@ -16,7 +16,7 @@
  * authorization. By placing all data under a user-specific path `/users/{userId}`,
  * ownership can be verified simply by checking the path parameter against the
  * authenticated user's ID. This avoids slow and costly `get()` calls to other documents.
- * Additionally, relational IDs (e.g., `userId`, `itemId`) are stored within documents
+ * Additionally, relational IDs (e.g., `userId`) are stored within documents
  * to enforce data integrity during creation and prevent re-parenting during updates.
  *
  * Structural Segregation: The design uses structural segregation by default. All
@@ -78,22 +78,6 @@ service cloud.firestore {
       return request.resource.data.userId == userId && request.resource.data.id == itemId;
     }
     
-    /**
-     * On create, validates that the Listing document's internal 'itemId' and 'id' fields
-     * match the IDs in the document's path.
-     */
-    function hasValidListingData(itemId, listingId) {
-      return request.resource.data.itemId == itemId && request.resource.data.id == listingId;
-    }
-
-    /**
-     * On create, validates that the Sale document's internal 'listingId' and 'id' fields
-     * match the IDs in the document's path.
-     */
-    function hasValidSaleData(listingId, saleId) {
-      return request.resource.data.listingId == listingId && request.resource.data.id == saleId;
-    }
-
     // ----------------------------------------------------------------------
     // Collection Rules
     // ----------------------------------------------------------------------
@@ -124,45 +108,9 @@ service cloud.firestore {
        * @principle Enforces strict data ownership within a user's private subcollection.
        */
       match /items/{itemId} {
-        allow get: if isOwner(userId);
-        allow list: if isOwner(userId);
+        allow get, list, delete: if isOwner(userId);
         allow create: if isOwner(userId) && hasValidItemData(userId, itemId);
         allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
-        allow delete: if isExistingOwner(userId);
-
-        /**
-         * @description Manages listings for a specific user-owned item.
-         * @path /users/{userId}/items/{itemId}/listings/{listingId}
-         * @allow (create) User 'user_abc' creates a new listing for their item at '/users/user_abc/items/item_123/listings/listing_456'.
-         * @allow (list) User 'user_abc' lists all listings for their own item.
-         * @deny (get) User 'user_xyz' attempts to read a listing from user 'user_abc'.
-         * @deny (update) User 'user_abc' attempts to change the 'itemId' of an existing listing, which would break relational integrity.
-         * @principle Inherits ownership from parent path and validates relational integrity on create/update.
-         */
-        match /listings/{listingId} {
-          allow get: if isOwner(userId);
-          allow list: if isOwner(userId);
-          allow create: if isOwner(userId) && hasValidListingData(itemId, listingId);
-          allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('itemId');
-          allow delete: if isExistingOwner(userId);
-          
-          /**
-           * @description Manages sales records for a specific user-owned listing.
-           * @path /users/{userId}/items/{itemId}/listings/{listingId}/sales/{saleId}
-           * @allow (create) User 'user_abc' creates a new sales record for their listing.
-           * @allow (get) User 'user_abc' reads a sales record for their own listing.
-           * @deny (list) User 'user_xyz' attempts to list sales records from user 'user_abc'.
-           * @deny (delete) User 'user_xyz' attempts to delete a sales record belonging to user 'user_abc'.
-           * @principle Enforces strict ownership at the deepest level of the data hierarchy.
-           */
-          match /sales/{saleId} {
-            allow get: if isOwner(userId);
-            allow list: if isOwner(userId);
-            allow create: if isOwner(userId) && hasValidSaleData(listingId, saleId);
-            allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('listingId');
-            allow delete: if isExistingOwner(userId);
-          }
-        }
       }
     }
   }

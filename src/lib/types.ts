@@ -1,7 +1,11 @@
+export type WithId<T> = T & { id: string };
+
 export type Item = {
   id: string;
+  userId: string;
   name: string;
   purchasePrice: number;
+  purchaseDate: any; // Can be Timestamp from Firebase
   salePrice: number | null;
   condition: 'New' | 'Used - Like New' | 'Used - Good' | 'Used - Fair' | 'For Parts';
   source: string;
@@ -11,8 +15,7 @@ export type Item = {
   enhancedTitle: string | null;
   enhancedDescription: string | null;
   reasoning: string | null;
-  dateAdded: string; // ISO string
-  dateSold: string | null; // ISO string
+  dateSold: any | null; // Can be Timestamp from Firebase
   platform: string;
   imageUrl: string;
   imageHint: string;
@@ -21,5 +24,5 @@ export type Item = {
 export type User = {
   name: string;
   email: string;
-  avatarUrl: string;
+  avatarUrl?: string;
 };

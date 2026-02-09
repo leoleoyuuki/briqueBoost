@@ -1,7 +1,33 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/firebase';
 import { LoginForm } from "@/components/auth/login-form";
 import { Logo } from "@/components/logo";
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LoginPage() {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || user) {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+            <div className="w-full max-w-md space-y-8">
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-64 w-full" />
+            </div>
+        </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">

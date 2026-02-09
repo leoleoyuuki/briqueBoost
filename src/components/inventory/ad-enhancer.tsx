@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { doc } from 'firebase/firestore';
+import { useFirestore, useUser, updateDocumentNonBlocking } from '@/firebase';
 import type { Item } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { enhanceAdCopyAction } from '@/lib/actions';
 import type { GenerateEnhancedAdCopyOutput } from '@/ai/flows/generate-enhanced-ad-copy';
-import { Sparkles, Bot, Wand2, Copy, Check } from 'lucide-react';
+import { Sparkles, Bot, Wand2, Copy, Check, Save } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
@@ -40,7 +42,9 @@ function ResultDisplay({ title, content, onCopy }: { title: string; content: str
     );
 }
 
-export function AdEnhancer({ item }: { item: Item }) {
+export function AdEnhancer({ item }: { item: WithId<Item> }) {
+  const { user } = useUser();
+  const firestore = useFirestore();
   const [itemDetails, setItemDetails] = useState('');
   const [result, setResult] = useState<GenerateEnhancedAdCopyOutput | null>(item.enhancedTitle ? {
       enhancedTitle: item.enhancedTitle,
@@ -78,6 +82,24 @@ export function AdEnhancer({ item }: { item: Item }) {
     toast({
         title: 'Copiado!',
         description: 'O texto foi copiado para a área de transferência.',
+    });
+  };
+
+  const handleUseEnhancedCopy = () => {
+    if (!user || !result) return;
+    
+    const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
+    const updatedData = {
+        enhancedTitle: result.enhancedTitle,
+        enhancedDescription: result.enhancedDescription,
+        reasoning: result.reasoning
+    };
+
+    updateDocumentNonBlocking(itemRef, updatedData);
+
+    toast({
+        title: 'Anúncio Atualizado!',
+        description: 'As versões aprimoradas do título e da descrição foram salvas.',
     });
   };
 
@@ -152,7 +174,10 @@ export function AdEnhancer({ item }: { item: Item }) {
                 <p className="text-sm text-muted-foreground border-l-2 border-accent pl-3 italic">{result.reasoning}</p>
             </div>
             <div className="flex justify-end pt-4">
-                <Button variant="secondary">Usar estas versões</Button>
+                <Button onClick={handleUseEnhancedCopy} variant="secondary">
+                  <Save className="mr-2 h-4 w-4" />
+                  Usar estas versões
+                </Button>
             </div>
         </div>
       )}
