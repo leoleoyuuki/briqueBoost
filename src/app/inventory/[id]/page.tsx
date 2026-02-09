@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
@@ -20,7 +21,13 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
 
   const { data: item, isLoading: isItemLoading } = useDoc<Item>(itemRef);
 
-  if (isUserLoading || isItemLoading) {
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/');
+    }
+  }, [isUserLoading, user, router]);
+
+  if (isUserLoading || isItemLoading || !user) {
     return (
         <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-1">
@@ -33,13 +40,9 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
     );
   }
 
-  if (!user) {
-      router.push('/');
-      return null;
-  }
-
   if (!item) {
     notFound();
+    return null;
   }
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { Item } from '@/lib/types';
@@ -34,6 +34,12 @@ export default function DashboardPage() {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
 
+    useEffect(() => {
+        if (!isUserLoading && !user) {
+            router.push('/');
+        }
+    }, [isUserLoading, user, router]);
+
     const itemsQuery = useMemoFirebase(() => {
         if (!user) return null;
         return collection(firestore, 'users', user.uid, 'items');
@@ -43,7 +49,7 @@ export default function DashboardPage() {
 
     const stats = useMemo(() => calculateStats(items), [items]);
 
-    if (isUserLoading) {
+    if (isUserLoading || !user) {
         return (
              <div className="space-y-8">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -56,12 +62,6 @@ export default function DashboardPage() {
             </div>
         );
     }
-    
-    if (!user) {
-        router.push('/');
-        return null;
-    }
-
 
     return (
         <div className="space-y-8">
