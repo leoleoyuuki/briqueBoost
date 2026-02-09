@@ -19,8 +19,20 @@ export type Item = {
   platform: string;
   imageUrl: string;
   imageHint: string;
+  profit?: number;
 };
 
+// Represents the user profile document stored in Firestore
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: any; // Can be Timestamp from Firebase
+  aiUsageCount: number;
+  aiUsageLastReset: any; // Can be Timestamp
+};
+
+// Represents the mock user data structure, not used with live data.
 export type User = {
   name: string;
   email: string;

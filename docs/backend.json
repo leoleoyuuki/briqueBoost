@@ -23,6 +23,15 @@
           "type": "string",
           "description": "Timestamp indicating when the user account was created.",
           "format": "date-time"
+        },
+        "aiUsageCount": {
+          "type": "number",
+          "description": "The number of times the user has used an AI feature in the current billing cycle."
+        },
+        "aiUsageLastReset": {
+          "type": "string",
+          "description": "Timestamp indicating when the AI usage count was last reset.",
+          "format": "date-time"
         }
       },
       "required": [
@@ -113,6 +122,10 @@
         "imageHint": {
             "type": "string",
             "description": "Hint for AI image generation."
+        },
+        "profit": {
+            "type": "number",
+            "description": "The profit made from the sale of the item."
         }
       },
       "required": [

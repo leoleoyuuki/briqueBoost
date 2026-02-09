@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { Item, WithId } from "@/lib/types";
 import { useUser, useFirestore, updateDocumentNonBlocking } from '@/firebase';
 import { doc, serverTimestamp } from 'firebase/firestore';
@@ -18,8 +19,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
+import { Pencil } from 'lucide-react';
 
-const formatCurrency = (value: number | null) => {
+const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return '-';
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 };
@@ -56,7 +58,7 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
       const profit = price - item.purchasePrice;
 
       const updatedData = {
-          status: 'Sold',
+          status: 'Sold' as const,
           salePrice: price,
           saleDate: serverTimestamp(),
           profit: profit,
@@ -79,8 +81,17 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
   return (
     <Card className="overflow-hidden">
         <CardHeader>
-            <CardTitle className="font-headline text-xl">{item.name}</CardTitle>
-            <CardDescription>{item.initialTitle}</CardDescription>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <CardTitle className="font-headline text-xl">{item.name}</CardTitle>
+                <CardDescription>{item.initialTitle}</CardDescription>
+              </div>
+              <Link href={`/inventory/${item.id}/edit`} passHref>
+                <Button variant="outline" size="icon" aria-label="Editar item">
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="relative aspect-[4/3] w-full">

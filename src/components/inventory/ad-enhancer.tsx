@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { doc } from 'firebase/firestore';
-import { useFirestore, useUser, updateDocumentNonBlocking } from '@/firebase';
-import type { Item } from '@/lib/types';
+import { doc, serverTimestamp } from 'firebase/firestore';
+import { useFirestore, useUser, updateDocumentNonBlocking, useDoc, useMemoFirebase } from '@/firebase';
+import type { Item, UserProfile } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +14,7 @@ import { Sparkles, Bot, Wand2, Copy, Check, Save } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
+import { isThisMonth } from 'date-fns';
 
 function ResultDisplay({ title, content, onCopy }: { title: string; content: string | null; onCopy: (text: string) => void }) {
     const [copied, setCopied] = useState(false);
@@ -45,6 +46,11 @@ function ResultDisplay({ title, content, onCopy }: { title: string; content: str
 export function AdEnhancer({ item }: { item: WithId<Item> }) {
   const { user } = useUser();
   const firestore = useFirestore();
+  const { toast } = useToast();
+  
+  const userProfileRef = useMemoFirebase(() => user ? doc(firestore, 'users', user.uid) : null, [firestore, user]);
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
+
   const [itemDetails, setItemDetails] = useState('');
   const [result, setResult] = useState<GenerateEnhancedAdCopyOutput | null>(item.enhancedTitle ? {
       enhancedTitle: item.enhancedTitle,
@@ -52,10 +58,34 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
       reasoning: item.reasoning ?? ''
   } : null);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  
+  const aiLimit = 20;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user || !userProfile) {
+        toast({ variant: 'destructive', title: 'Usuário não encontrado.' });
+        return;
+    }
+    
+    let currentUsage = userProfile.aiUsageCount ?? 0;
+    const lastReset = userProfile.aiUsageLastReset?.toDate() ?? new Date(0);
+    const needsReset = !isThisMonth(lastReset);
+
+    if (needsReset) {
+      currentUsage = 0;
+    }
+
+    if (currentUsage >= aiLimit) {
+        toast({
+            variant: 'destructive',
+            title: 'Limite de IA atingido',
+            description: 'Você atingiu seu limite mensal de 20 usos do assistente de IA.',
+        });
+        return;
+    }
+
     setIsLoading(true);
     setResult(null);
 
@@ -66,6 +96,15 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
         itemDetails: itemDetails,
       });
       setResult(response);
+
+      // Increment usage on success
+      const userRef = doc(firestore, 'users', user.uid);
+      if (needsReset) {
+          updateDocumentNonBlocking(userRef, { aiUsageCount: 1, aiUsageLastReset: serverTimestamp() });
+      } else {
+          updateDocumentNonBlocking(userRef, { aiUsageCount: currentUsage + 1 });
+      }
+
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -103,6 +142,8 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
     });
   };
 
+  const canUseAi = (userProfile?.aiUsageCount ?? 0) < aiLimit;
+
   return (
     <Card>
       <CardHeader>
@@ -128,7 +169,7 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading || isProfileLoading || !canUseAi}>
             {isLoading ? (
               <>
                 <Bot className="mr-2 h-4 w-4 animate-spin" />

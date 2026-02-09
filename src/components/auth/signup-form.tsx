@@ -56,6 +56,8 @@ export function SignupForm() {
             name: name,
             email: user.email,
             createdAt: serverTimestamp(),
+            aiUsageCount: 0,
+            aiUsageLastReset: serverTimestamp(),
         });
         
         router.push('/dashboard');
