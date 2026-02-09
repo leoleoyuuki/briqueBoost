@@ -61,28 +61,36 @@ export default function DashboardPage() {
 
     if (isUserLoading || !user) {
         return (
-             <div className="space-y-8">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Skeleton className="h-32" />
-                    <Skeleton className="h-32" />
-                    <Skeleton className="h-32" />
-                    <Skeleton className="h-32" />
+             <div className="space-y-6">
+                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                    <Skeleton className="h-32 rounded-xl" />
+                    <Skeleton className="h-32 rounded-xl" />
+                    <Skeleton className="h-32 rounded-xl" />
+                    <Skeleton className="h-32 rounded-xl" />
                 </div>
-                <Skeleton className="h-[450px]" />
-                <Skeleton className="h-96" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <Skeleton className="lg:col-span-2 h-[450px] rounded-xl" />
+                    <Skeleton className="lg:col-span-1 h-[450px] rounded-xl" />
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <StatCards stats={stats} />
-            <div className="grid gap-8 grid-cols-1 xl:grid-cols-5">
-              <div className="xl:col-span-3">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+              <div className="lg:col-span-2">
                   <ProfitChart items={items} isLoading={areItemsLoading} />
               </div>
-              <div className="xl:col-span-2">
-                 <InventoryTable items={sortedItems.slice(0, 5)} isLoading={areItemsLoading} title="Inventário Recente" description="Seus 5 itens adicionados mais recentemente."/>
+              <div className="lg:col-span-1">
+                 <InventoryTable 
+                    items={sortedItems.slice(0, 5)} 
+                    isLoading={areItemsLoading} 
+                    title="Inventário Recente" 
+                    description="Seus itens adicionados mais recentemente."
+                    showViewAll={true}
+                />
               </div>
             </div>
         </div>

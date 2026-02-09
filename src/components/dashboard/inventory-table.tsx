@@ -17,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Item } from "@/lib/types";
-import { ArrowUpRight, Inbox, Package } from "lucide-react";
+import { ArrowUpRight, Inbox } from "lucide-react";
 import Image from 'next/image';
 import { Skeleton } from '../ui/skeleton';
 
@@ -31,13 +31,15 @@ interface InventoryTableProps {
     isLoading: boolean;
     title?: string;
     description?: string;
+    showViewAll?: boolean;
 }
 
 export function InventoryTable({ 
     items, 
     isLoading, 
     title = "Inventário", 
-    description = "Uma lista dos seus itens em estoque e vendidos." 
+    description = "Uma lista dos seus itens em estoque e vendidos.",
+    showViewAll = false
 }: InventoryTableProps) {
   
   const renderEmptyState = () => (
@@ -53,33 +55,34 @@ export function InventoryTable({
 
   return (
     <Card className='h-full flex flex-col'>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-            <Package className="h-6 w-6 text-primary" />
-            <CardTitle className="font-headline">{title}</CardTitle>
+      <CardHeader className="flex-row items-center justify-between">
+        <div>
+            <CardTitle className="font-headline text-lg">{title}</CardTitle>
+            <CardDescription>
+            {description}
+            </CardDescription>
         </div>
-        <CardDescription>
-          {description}
-        </CardDescription>
+        {showViewAll && (
+            <Link href="/inventory" passHref>
+                <Button variant="outline" size="sm">Ver Todos</Button>
+            </Link>
+        )}
       </CardHeader>
       <CardContent className="flex-grow">
         {isLoading ? (
-            <div className="space-y-4 p-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
+            <div className="space-y-2 p-4">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
             </div>
         ) : items.length > 0 ? (
             <Table>
                 <TableHeader>
                     <TableRow>
-                    <TableHead className="hidden w-[64px] sm:table-cell">
-                        <span className="sr-only">Imagem</span>
-                    </TableHead>
-                    <TableHead>Nome</TableHead>
+                    <TableHead>Item</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">Lucro</TableHead>
+                    <TableHead className="hidden md:table-cell text-right">Lucro</TableHead>
                     <TableHead>
                         <span className="sr-only">Ações</span>
                     </TableHead>
@@ -88,26 +91,28 @@ export function InventoryTable({
                 <TableBody>
                     {items.map((item) => (
                         <TableRow key={item.id}>
-                            <TableCell className="hidden sm:table-cell">
-                            <Image
-                                alt={item.name}
-                                className="aspect-square rounded-md object-cover"
-                                height="64"
-                                src={item.imageUrl ?? `https://picsum.photos/seed/${item.id}/64/64`}
-                                width="64"
-                                data-ai-hint={item.imageHint}
-                            />
-                            </TableCell>
-                            <TableCell className="font-medium">{item.name}</TableCell>
                             <TableCell>
-                            <Badge variant={item.status === 'Sold' ? 'outline' : 'secondary'}>
-                                {item.status === 'Sold' ? 'Vendido' : 'Em Estoque'}
-                            </Badge>
+                                <div className="flex items-center gap-3">
+                                    <Image
+                                        alt={item.name}
+                                        className="aspect-square rounded-md object-cover"
+                                        height="40"
+                                        src={item.imageUrl ?? `https://picsum.photos/seed/${item.id}/40/40`}
+                                        width="40"
+                                    />
+                                    <div className='font-medium'>{item.name}</div>
+                                </div>
                             </TableCell>
-                            <TableCell className={`hidden md:table-cell font-semibold ${item.profit !== null && item.profit !== undefined ? (item.profit >= 0 ? 'text-green-600' : 'text-red-600') : 'text-muted-foreground'}`}>
+                            
+                            <TableCell>
+                                <Badge variant={item.status === 'Sold' ? 'outline' : 'secondary'}>
+                                    {item.status === 'Sold' ? 'Vendido' : 'Em Estoque'}
+                                </Badge>
+                            </TableCell>
+                            <TableCell className={`hidden md:table-cell text-right font-semibold ${item.profit !== null && item.profit !== undefined ? (item.profit >= 0 ? 'text-emerald-600' : 'text-red-600') : 'text-muted-foreground'}`}>
                                 {item.status === 'Sold' ? formatCurrency(item.profit) : '-'}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="text-right">
                             <Link href={`/inventory/${item.id}`} passHref>
                                 <Button aria-label="View Item" size="icon" variant="ghost">
                                     <ArrowUpRight className="h-4 w-4" />

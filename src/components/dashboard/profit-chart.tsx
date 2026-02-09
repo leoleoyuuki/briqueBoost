@@ -7,7 +7,6 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart as BarChartIcon } from 'lucide-react';
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -77,17 +76,14 @@ export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoad
     return (
         <Card className="h-full flex flex-col">
             <CardHeader>
-                 <div className="flex items-center gap-2">
-                    <BarChartIcon className="h-6 w-6 text-primary" />
-                    <CardTitle className="font-headline">Lucro Mensal</CardTitle>
-                </div>
+                <CardTitle className="font-headline text-lg">Dinâmica de Lucro</CardTitle>
                 <CardDescription>Lucro dos itens vendidos nos últimos 6 meses.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
+            <CardContent className="flex-grow pl-2">
                 <div className="h-[350px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                             <XAxis
                                 dataKey="name"
                                 stroke="hsl(var(--muted-foreground))"
@@ -100,7 +96,7 @@ export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoad
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => formatCurrency(value as number)}
+                                tickFormatter={(value) => `R$${(value as number) / 1000}k`}
                             />
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--accent))' }} />
                             <Bar 
