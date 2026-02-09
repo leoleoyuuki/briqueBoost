@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useUser, useFirestore, addDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
+import { useUser, useFirestore, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
 import { collection, doc, serverTimestamp } from 'firebase/firestore';
 import type { Item, WithId } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -83,8 +83,11 @@ export function ItemForm({ item }: ItemFormProps) {
         } else {
             // Add new item
             const itemsCollection = collection(firestore, 'users', user.uid, 'items');
+            const newDocRef = doc(itemsCollection); // Create ref with new ID
+
             const newItemData = {
                 ...commonData,
+                id: newDocRef.id, // Add ID to document data
                 userId: user.uid,
                 purchaseDate: serverTimestamp(),
                 status: 'In Stock' as 'In Stock',
@@ -95,13 +98,11 @@ export function ItemForm({ item }: ItemFormProps) {
                 reasoning: null,
                 dateSold: null,
                 platform: '',
-                imageUrl: `https://picsum.photos/seed/${Math.random()}/600/400`,
+                imageUrl: `https://picsum.photos/seed/${newDocRef.id}/600/400`,
                 imageHint: 'new item'
             };
-            const docRef = await addDocumentNonBlocking(itemsCollection, {});
-            const itemWithId = { ...newItemData, id: docRef.id };
-            const newItemRef = doc(firestore, 'users', user.uid, 'items', docRef.id);
-            updateDocumentNonBlocking(newItemRef, itemWithId);
+            
+            setDocumentNonBlocking(newDocRef, newItemData, {}); // Use setDoc to create
             
             toast({ title: 'Item adicionado com sucesso!'});
             router.push('/dashboard');
