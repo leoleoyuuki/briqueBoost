@@ -17,76 +17,76 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Item } from "@/lib/types";
-import { ArrowUpRight, Inbox } from "lucide-react";
+import { ArrowUpRight, Inbox, Package } from "lucide-react";
 import Image from 'next/image';
 import { Skeleton } from '../ui/skeleton';
 
-const formatCurrency = (value: number | null) => {
+const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return '-';
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 };
 
-export function InventoryTable({ items, isLoading }: { items: Item[]; isLoading: boolean }) {
+interface InventoryTableProps {
+    items: Item[];
+    isLoading: boolean;
+    title?: string;
+    description?: string;
+}
+
+export function InventoryTable({ 
+    items, 
+    isLoading, 
+    title = "Inventário", 
+    description = "Uma lista dos seus itens em estoque e vendidos." 
+}: InventoryTableProps) {
   
   const renderEmptyState = () => (
-    <TableRow>
-        <TableCell colSpan={6}>
-            <div className="flex flex-col items-center justify-center text-center p-12">
-                <Inbox className="h-16 w-16 text-muted-foreground/50" />
-                <h3 className="text-xl font-semibold mt-4">Nenhum item no inventário</h3>
-                <p className="text-muted-foreground mt-2">Comece adicionando um novo item para vê-lo aqui.</p>
-                 <Link href="/inventory/new" passHref>
-                    <Button className="mt-4">Adicionar Novo Item</Button>
-                </Link>
-            </div>
-        </TableCell>
-    </TableRow>
-  );
-  
-  const renderLoadingState = () => (
-      Array.from({ length: 4 }).map((_, index) => (
-        <TableRow key={`loading-${index}`}>
-            <TableCell className="hidden sm:table-cell">
-                <Skeleton className="h-16 w-16 rounded-md" />
-            </TableCell>
-            <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-            <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-            <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
-        </TableRow>
-      ))
+    <div className="flex flex-col items-center justify-center text-center p-12 h-full">
+        <Inbox className="h-16 w-16 text-muted-foreground/50" />
+        <h3 className="text-xl font-semibold mt-4">Nenhum item no inventário</h3>
+        <p className="text-muted-foreground mt-2">Comece adicionando um novo item para vê-lo aqui.</p>
+         <Link href="/inventory/new" passHref>
+            <Button className="mt-4">Adicionar Novo Item</Button>
+        </Link>
+    </div>
   );
 
   return (
-    <Card>
+    <Card className='h-full flex flex-col'>
       <CardHeader>
-        <CardTitle className="font-headline">Inventário Recente</CardTitle>
+        <div className="flex items-center gap-2">
+            <Package className="h-6 w-6 text-primary" />
+            <CardTitle className="font-headline">{title}</CardTitle>
+        </div>
         <CardDescription>
-          Uma lista dos seus itens mais recentes em estoque e vendidos.
+          {description}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="hidden w-[100px] sm:table-cell">
-                <span className="sr-only">Imagem</span>
-              </TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">Preço de Compra</TableHead>
-              <TableHead className="hidden md:table-cell">Preço de Venda</TableHead>
-              <TableHead>
-                <span className="sr-only">Ações</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading 
-                ? renderLoadingState()
-                : items.length > 0
-                    ? items.map((item) => (
+      <CardContent className="flex-grow">
+        {isLoading ? (
+            <div className="space-y-4 p-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+            </div>
+        ) : items.length > 0 ? (
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead className="hidden w-[64px] sm:table-cell">
+                        <span className="sr-only">Imagem</span>
+                    </TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden md:table-cell">Lucro</TableHead>
+                    <TableHead>
+                        <span className="sr-only">Ações</span>
+                    </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {items.map((item) => (
                         <TableRow key={item.id}>
                             <TableCell className="hidden sm:table-cell">
                             <Image
@@ -104,21 +104,23 @@ export function InventoryTable({ items, isLoading }: { items: Item[]; isLoading:
                                 {item.status === 'Sold' ? 'Vendido' : 'Em Estoque'}
                             </Badge>
                             </TableCell>
-                            <TableCell className="hidden md:table-cell">{formatCurrency(item.purchasePrice)}</TableCell>
-                            <TableCell className="hidden md:table-cell">{formatCurrency(item.salePrice)}</TableCell>
+                            <TableCell className={`hidden md:table-cell font-semibold ${item.profit !== null && item.profit !== undefined ? (item.profit >= 0 ? 'text-green-600' : 'text-red-600') : 'text-muted-foreground'}`}>
+                                {item.status === 'Sold' ? formatCurrency(item.profit) : '-'}
+                            </TableCell>
                             <TableCell>
                             <Link href={`/inventory/${item.id}`} passHref>
-                                <Button aria-label="Edit" size="icon" variant="ghost">
+                                <Button aria-label="View Item" size="icon" variant="ghost">
                                     <ArrowUpRight className="h-4 w-4" />
                                 </Button>
                             </Link>
                             </TableCell>
                         </TableRow>
-                        ))
-                    : renderEmptyState()
-            }
-          </TableBody>
-        </Table>
+                        ))}
+                </TableBody>
+            </Table>
+        ) : (
+            renderEmptyState()
+        )}
       </CardContent>
     </Card>
   );
