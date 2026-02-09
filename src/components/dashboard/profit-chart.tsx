@@ -3,23 +3,21 @@
 import { useMemo } from 'react';
 import type { Item } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { AreaChart, Area, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(value);
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
-            <div className="rounded-lg border bg-background p-2 shadow-sm">
-                <div className="grid grid-cols-1 gap-1 text-center">
-                    <span className="text-[0.8rem] font-bold capitalize text-foreground">{label}</span>
-                    <span className="font-bold text-primary">{formatCurrency(payload[0].value)}</span>
-                </div>
+            <div className="rounded-lg border border-border bg-background/90 p-2 shadow-sm">
+                 <p className="text-sm font-semibold capitalize text-foreground">{label}</p>
+                 <p className="text-sm text-primary">{formatCurrency(payload[0].value)}</p>
             </div>
         );
     }
@@ -33,7 +31,7 @@ export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoad
 
         // Initialize last 6 months with 0 profit
         for (const month of months) {
-            const monthKey = format(month, 'MMM/yy', { locale: ptBR });
+            const monthKey = format(month, 'MMM', { locale: ptBR });
             monthlyProfits[monthKey] = 0;
         }
 
@@ -45,7 +43,7 @@ export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoad
                 const sixMonthsAgo = subMonths(new Date(), 6);
                 
                 if (saleDate >= sixMonthsAgo) {
-                    const monthKey = format(saleDate, 'MMM/yy', { locale: ptBR });
+                    const monthKey = format(saleDate, 'MMM', { locale: ptBR });
                     if (monthlyProfits.hasOwnProperty(monthKey)) {
                          monthlyProfits[monthKey] += item.profit!;
                     }
@@ -61,7 +59,7 @@ export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoad
 
     if (isLoading) {
         return (
-             <Card>
+             <Card className="bg-card">
                 <CardHeader>
                     <Skeleton className="h-6 w-1/3" />
                     <Skeleton className="h-4 w-1/2" />
@@ -74,15 +72,21 @@ export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoad
     }
 
     return (
-        <Card className="h-full flex flex-col">
+        <Card className="h-full flex flex-col bg-card">
             <CardHeader>
-                <CardTitle className="font-headline text-lg">Dinâmica de Lucro</CardTitle>
+                <CardTitle className="font-semibold text-lg text-foreground">Análise</CardTitle>
                 <CardDescription>Lucro dos itens vendidos nos últimos 6 meses.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow pl-2">
                 <div className="h-[350px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                        <AreaChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                            <defs>
+                                <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
+                                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                             <XAxis
                                 dataKey="name"
@@ -98,13 +102,16 @@ export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoad
                                 axisLine={false}
                                 tickFormatter={(value) => `R$${(value as number) / 1000}k`}
                             />
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--accent))' }} />
-                            <Bar 
+                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }} />
+                            <Area 
+                                type="monotone" 
                                 dataKey="profit" 
-                                fill="hsl(var(--primary))" 
-                                radius={[4, 4, 0, 0]} 
+                                stroke="hsl(var(--primary))"
+                                strokeWidth={2}
+                                fillOpacity={1} 
+                                fill="url(#colorProfit)" 
                             />
-                        </BarChart>
+                        </AreaChart>
                     </ResponsiveContainer>
                 </div>
             </CardContent>

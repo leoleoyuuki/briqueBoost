@@ -7,6 +7,7 @@ import type { Item } from '@/lib/types';
 import { StatCards } from '@/components/dashboard/stat-cards';
 import { InventoryTable } from '@/components/dashboard/inventory-table';
 import { ProfitChart } from '@/components/dashboard/profit-chart';
+import { ItemSummary } from '@/components/dashboard/item-summary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 
@@ -62,15 +63,16 @@ export default function DashboardPage() {
     if (isUserLoading || !user) {
         return (
              <div className="space-y-6">
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                    <Skeleton className="h-32 rounded-xl" />
-                    <Skeleton className="h-32 rounded-xl" />
-                    <Skeleton className="h-32 rounded-xl" />
-                    <Skeleton className="h-32 rounded-xl" />
+                <h1 className="text-2xl font-semibold">Dashboard</h1>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <Skeleton className="h-40 rounded-xl" />
+                    <Skeleton className="h-40 rounded-xl" />
+                    <Skeleton className="h-40 rounded-xl" />
+                    <Skeleton className="h-40 rounded-xl" />
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <Skeleton className="lg:col-span-3 h-[450px] rounded-xl" />
                     <Skeleton className="lg:col-span-2 h-[450px] rounded-xl" />
-                    <Skeleton className="lg:col-span-1 h-[450px] rounded-xl" />
                 </div>
             </div>
         );
@@ -78,20 +80,23 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
+            <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
             <StatCards stats={stats} />
-            <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-              <div className="lg:col-span-2">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-5">
+              <div className="lg:col-span-3">
                   <ProfitChart items={items} isLoading={areItemsLoading} />
               </div>
-              <div className="lg:col-span-1">
-                 <InventoryTable 
-                    items={sortedItems.slice(0, 5)} 
-                    isLoading={areItemsLoading} 
-                    title="Inventário Recente" 
-                    description="Seus itens adicionados mais recentemente."
-                    showViewAll={true}
-                />
+              <div className="lg:col-span-2">
+                 <ItemSummary items={items} isLoading={areItemsLoading}/>
               </div>
+            </div>
+             <div>
+                <InventoryTable 
+                    items={sortedItems} 
+                    isLoading={areItemsLoading} 
+                    title="Histórico de Transações" 
+                    description="Uma lista de todos os seus itens."
+                />
             </div>
         </div>
     );

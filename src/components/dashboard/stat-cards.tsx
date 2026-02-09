@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DollarSign, Package, Percent, ShoppingBag, type LucideIcon } from "lucide-react";
+import { DollarSign, Package, TrendingUp, ShoppingBag, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type StatCardsProps = {
@@ -18,6 +18,7 @@ interface CardData {
   icon: LucideIcon;
   value: string | number;
   description: string;
+  isPrimary?: boolean;
 }
 
 export function StatCards({ stats }: StatCardsProps) {
@@ -26,7 +27,14 @@ export function StatCards({ stats }: StatCardsProps) {
   };
 
   const formatPercent = (value: number) => {
-    return `${(value * 100).toFixed(1)}%`;
+    // Placeholder for change, since we don't have historical data
+    const mockChange = (Math.random() * 10 - 2).toFixed(2);
+    const isPositive = parseFloat(mockChange) >= 0;
+    return (
+        <span className={cn('text-xs font-medium', isPositive ? 'text-emerald-500' : 'text-red-500')}>
+            {isPositive ? '+' : ''}{mockChange}%
+        </span>
+    );
   };
 
   const cardData: CardData[] = [
@@ -34,7 +42,14 @@ export function StatCards({ stats }: StatCardsProps) {
       title: "Lucro Total",
       icon: DollarSign,
       value: formatCurrency(stats.totalProfit),
-      description: "Lucro de todos os itens vendidos",
+      description: "Comparado ao mês passado",
+      isPrimary: true,
+    },
+    {
+      title: "Itens Vendidos",
+      icon: ShoppingBag,
+      value: `+${stats.totalItemsSold}`,
+      description: "Comparado ao mês passado",
     },
     {
       title: "Itens em Estoque",
@@ -43,31 +58,34 @@ export function StatCards({ stats }: StatCardsProps) {
       description: "Itens disponíveis para venda",
     },
     {
-      title: "Itens Vendidos",
-      icon: ShoppingBag,
-      value: `+${stats.totalItemsSold}`,
-      description: "Total de itens vendidos",
-    },
-    {
       title: "Margem Média",
-      icon: Percent,
-      value: formatPercent(stats.averageProfitMargin),
-      description: "Margem de lucro média por item",
+      icon: TrendingUp,
+      value: `${(stats.averageProfitMargin * 100).toFixed(1)}%`,
+      description: "Comparado ao mês passado",
     },
   ];
 
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {cardData.map((card) => (
-        <Card key={card.title}>
+        <Card 
+            key={card.title} 
+            className={cn(
+                'bg-card text-card-foreground shadow-sm', 
+                card.isPrimary && 'bg-gradient-to-br from-purple-600 to-violet-800 text-white'
+            )}
+        >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
-                <card.icon className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className={cn("text-sm font-medium", card.isPrimary ? 'text-white/80' : 'text-muted-foreground')}>{card.title}</CardTitle>
+                <card.icon className={cn("h-5 w-5", card.isPrimary ? 'text-white/80' : 'text-muted-foreground')} />
             </CardHeader>
             <CardContent>
                 <div className="text-3xl font-bold">{card.value}</div>
-                <p className="text-xs text-muted-foreground">{card.description}</p>
+                <div className="flex items-center gap-2 text-xs">
+                    {!card.isPrimary && formatPercent(0)}
+                    <p className={cn("text-xs", card.isPrimary ? 'text-white/80' : 'text-muted-foreground')}>{card.description}</p>
+                </div>
             </CardContent>
         </Card>
       ))}

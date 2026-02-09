@@ -40,10 +40,11 @@ export default function InventoryPage() {
         });
     }, [items]);
 
-    if (isUserLoading || !user || areItemsLoading) {
+    if (isUserLoading || !user) {
         return (
             <div className="space-y-4">
-                <div className="flex justify-end">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-semibold">Inventário</h1>
                     <Skeleton className="h-10 w-40" />
                 </div>
                 <Skeleton className="h-[600px] w-full rounded-xl" />
@@ -53,7 +54,8 @@ export default function InventoryPage() {
 
     return (
         <div className="space-y-4">
-             <div className="flex justify-end">
+             <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-semibold">Inventário</h1>
                 <Link href="/inventory/new" passHref>
                     <Button>
                         <PlusCircle className="mr-2 h-4 w-4" />

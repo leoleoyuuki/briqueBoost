@@ -17,14 +17,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Item } from "@/lib/types";
-import { ArrowUpRight, Inbox } from "lucide-react";
+import { ArrowUpRight, MoreHorizontal, Inbox, Dot } from "lucide-react";
 import Image from 'next/image';
 import { Skeleton } from '../ui/skeleton';
+import { format } from 'date-fns';
 
 const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return '-';
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 };
+
+const formatDate = (date: any) => {
+  if (!date) return '-';
+  const d = date.toDate ? date.toDate() : new Date(date);
+  return format(d, 'MMM dd, yyyy');
+}
 
 interface InventoryTableProps {
     items: Item[];
@@ -54,21 +61,15 @@ export function InventoryTable({
   );
 
   return (
-    <Card className='h-full flex flex-col'>
+    <Card className='h-full flex flex-col bg-card'>
       <CardHeader className="flex-row items-center justify-between">
         <div>
-            <CardTitle className="font-headline text-lg">{title}</CardTitle>
-            <CardDescription>
-            {description}
-            </CardDescription>
+            <CardTitle className="font-semibold text-lg text-foreground">{title}</CardTitle>
+            {description && <CardDescription>{description}</CardDescription>}
         </div>
-        {showViewAll && (
-            <Link href="/inventory" passHref>
-                <Button variant="outline" size="sm">Ver Todos</Button>
-            </Link>
-        )}
+        {/* Actions like download or re-issue can go here */}
       </CardHeader>
-      <CardContent className="flex-grow">
+      <CardContent className="flex-grow p-0">
         {isLoading ? (
             <div className="space-y-2 p-4">
                 <Skeleton className="h-12 w-full" />
@@ -79,43 +80,50 @@ export function InventoryTable({
         ) : items.length > 0 ? (
             <Table>
                 <TableHeader>
-                    <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell text-right">Lucro</TableHead>
-                    <TableHead>
-                        <span className="sr-only">Ações</span>
-                    </TableHead>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead>Item</TableHead>
+                      <TableHead className="hidden sm:table-cell">Preço de Compra</TableHead>
+                      <TableHead className="hidden md:table-cell">Data da Compra</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">
+                          <span className="sr-only">Ações</span>
+                      </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {items.map((item) => (
-                        <TableRow key={item.id}>
+                        <TableRow key={item.id} className="border-t border-border hover:bg-muted/50">
                             <TableCell>
                                 <div className="flex items-center gap-3">
                                     <Image
                                         alt={item.name}
-                                        className="aspect-square rounded-md object-cover"
+                                        className="aspect-square rounded-md object-cover hidden sm:block"
                                         height="40"
                                         src={item.imageUrl ?? `https://picsum.photos/seed/${item.id}/40/40`}
                                         width="40"
                                     />
-                                    <div className='font-medium'>{item.name}</div>
+                                    <div className='font-medium text-foreground'>{item.name}</div>
                                 </div>
                             </TableCell>
-                            
+                            <TableCell className="hidden sm:table-cell text-muted-foreground">{formatCurrency(item.purchasePrice)}</TableCell>
+                            <TableCell className="hidden md:table-cell text-muted-foreground">{formatDate(item.purchaseDate)}</TableCell>
                             <TableCell>
-                                <Badge variant={item.status === 'Sold' ? 'outline' : 'secondary'}>
+                                <Badge 
+                                    variant='outline' 
+                                    className={
+                                        item.status === 'Sold' 
+                                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
+                                        : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                    }
+                                >
+                                    <Dot className='-ml-1 mr-0.5' />
                                     {item.status === 'Sold' ? 'Vendido' : 'Em Estoque'}
                                 </Badge>
                             </TableCell>
-                            <TableCell className={`hidden md:table-cell text-right font-semibold ${item.profit !== null && item.profit !== undefined ? (item.profit >= 0 ? 'text-emerald-600' : 'text-red-600') : 'text-muted-foreground'}`}>
-                                {item.status === 'Sold' ? formatCurrency(item.profit) : '-'}
-                            </TableCell>
                             <TableCell className="text-right">
                             <Link href={`/inventory/${item.id}`} passHref>
-                                <Button aria-label="View Item" size="icon" variant="ghost">
-                                    <ArrowUpRight className="h-4 w-4" />
+                                <Button aria-label="View Item" size="sm" variant="outline">
+                                    Ver
                                 </Button>
                             </Link>
                             </TableCell>
