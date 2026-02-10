@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Item } from "@/lib/types";
-import { Inbox, Dot } from "lucide-react";
+import { Inbox, Dot, Package } from "lucide-react";
 import Image from 'next/image';
 import { Skeleton } from '../ui/skeleton';
 import { format } from 'date-fns';
@@ -83,13 +83,19 @@ export function InventoryTable({
                         <TableRow key={item.id} className="border-slate-800">
                             <TableCell>
                                 <div className="flex items-center gap-3">
-                                    <Image
-                                        alt={item.name}
-                                        className="aspect-square rounded-lg object-cover hidden sm:block"
-                                        height="40"
-                                        src={item.imageUrl ?? `https://picsum.photos/seed/${item.id}/40/40`}
-                                        width="40"
-                                    />
+                                    {item.imageUrl ? (
+                                        <Image
+                                            alt={item.name}
+                                            className="aspect-square rounded-lg object-cover hidden sm:block"
+                                            height="40"
+                                            src={item.imageUrl}
+                                            width="40"
+                                        />
+                                    ) : (
+                                        <div className="hidden sm:flex aspect-square h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
+                                            <Package className="h-5 w-5 text-slate-500" />
+                                        </div>
+                                    )}
                                     <div className='font-medium text-white'>{item.name}</div>
                                 </div>
                             </TableCell>

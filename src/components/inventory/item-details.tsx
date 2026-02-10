@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Dot } from 'lucide-react';
+import { Pencil, Dot, ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 const formatCurrency = (value: number | null | undefined) => {
@@ -139,13 +139,18 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
         </div>
         <div className="p-6 space-y-6">
             <div className="relative aspect-[4/3] w-full">
-                <Image
-                    src={item.imageUrl ?? `https://picsum.photos/seed/${item.id}/400/300`}
-                    alt={item.name}
-                    fill
-                    className="object-cover rounded-2xl"
-                    data-ai-hint={item.imageHint}
-                />
+                {item.imageUrl ? (
+                    <Image
+                        src={item.imageUrl}
+                        alt={item.name}
+                        fill
+                        className="object-cover rounded-2xl"
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center rounded-2xl bg-slate-800">
+                        <ImageIcon className="h-24 w-24 text-slate-600" />
+                    </div>
+                )}
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-6 text-sm">
                 <div>

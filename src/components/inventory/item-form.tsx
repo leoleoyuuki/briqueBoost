@@ -48,6 +48,7 @@ export function ItemForm({ item }: ItemFormProps) {
     source: item?.source ?? '',
     initialTitle: item?.initialTitle ?? '',
     initialDescription: item?.initialDescription ?? '',
+    imageUrl: item?.imageUrl ?? '',
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -75,6 +76,7 @@ export function ItemForm({ item }: ItemFormProps) {
         source: formData.source,
         initialTitle: formData.initialTitle,
         initialDescription:formData.initialDescription,
+        imageUrl: formData.imageUrl || null,
     };
     
     try {
@@ -98,16 +100,14 @@ export function ItemForm({ item }: ItemFormProps) {
                 id: newDocRef.id, // Add ID to document data
                 userId: user.uid,
                 purchaseDate: serverTimestamp(),
-                status: 'In Stock' as 'In Stock',
-                // Default values for other fields
+                status: 'In Stock' as const,
                 salePrice: null,
                 enhancedTitle: null,
                 enhancedDescription: null,
                 reasoning: null,
                 dateSold: null,
                 platform: '',
-                imageUrl: `https://picsum.photos/seed/${newDocRef.id}/600/400`,
-                imageHint: 'new item'
+                imageHint: null,
             };
             
             const conditionField = getConditionStockField(formData.condition);
@@ -198,6 +198,12 @@ export function ItemForm({ item }: ItemFormProps) {
               </div>
           </div>
           
+          <div className="grid gap-2">
+            <Label htmlFor="imageUrl" className="text-slate-400">Link da Imagem (opcional)</Label>
+            <Input id="imageUrl" name="imageUrl" placeholder="Cole o link da imagem do anúncio (ex: Facebook Marketplace)" value={formData.imageUrl ?? ''} onChange={handleChange} 
+                   className={inputStyle} />
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="initialTitle" className="text-slate-400">Título Inicial do Anúncio</Label>
             <Input id="initialTitle" name="initialTitle" placeholder="O título que você usaria" value={formData.initialTitle} onChange={handleChange} 

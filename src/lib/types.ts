@@ -17,8 +17,8 @@ export type Item = {
   reasoning: string | null;
   dateSold: any | null; // Can be Timestamp from Firebase
   platform: string;
-  imageUrl: string;
-  imageHint: string;
+  imageUrl: string | null;
+  imageHint: string | null;
   profit?: number;
 };
 
