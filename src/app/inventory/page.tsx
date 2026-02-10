@@ -42,7 +42,7 @@ export default function InventoryPage() {
 
     if (isUserLoading || !user) {
         return (
-            <div className="p-6 md:p-8 space-y-6">
+            <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <Skeleton className="h-10 w-48" />
                     <Skeleton className="h-10 w-40" />
@@ -53,7 +53,7 @@ export default function InventoryPage() {
     }
 
     return (
-        <div className="p-6 md:p-8 space-y-6">
+        <div className="space-y-6">
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
                 <div className="p-6 border-b border-slate-800">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">

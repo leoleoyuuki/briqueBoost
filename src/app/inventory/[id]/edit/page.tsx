@@ -29,7 +29,7 @@ export default function EditItemPage() {
   }, [isUserLoading, user, router]);
 
   const renderSkeleton = () => (
-    <div className="p-6 md:p-8">
+    <div>
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-8">
             <div className="grid gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -57,7 +57,7 @@ export default function EditItemPage() {
   }
 
   return (
-    <div className="p-6 md:p-8">
+    <div>
       <ItemForm item={item} />
     </div>
   );
