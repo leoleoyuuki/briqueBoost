@@ -2,18 +2,24 @@
 
 import { useMemo } from 'react';
 import type { MonthlySummary } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AreaChart, Area, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { format, subMonths, getMonth, getYear } from 'date-fns';
+import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface ProfitChartProps {
+    summaries: MonthlySummary[] | null;
+    isLoading: boolean;
+    view: 'profit' | 'revenue';
+}
+
+const CustomTooltip = ({ active, payload, label, view }: any) => {
     if (active && payload && payload.length) {
+        const colorClass = view === 'profit' ? 'text-primary' : 'text-chart-2';
         return (
-            <div className="rounded-lg border border-border bg-background/90 p-2 shadow-sm">
+            <div className="rounded-lg border border-border bg-background/90 p-2 shadow-sm backdrop-blur-sm">
                  <p className="text-sm font-semibold capitalize text-foreground">{label}</p>
-                 <p className="text-sm text-primary">
+                 <p className={`text-sm font-medium ${colorClass}`}>
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(payload[0].value)}
                  </p>
             </div>
@@ -22,13 +28,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export function ProfitChart({ summaries, isLoading }: { summaries: MonthlySummary[] | null; isLoading: boolean }) {
+export function ProfitChart({ summaries, isLoading, view = 'profit' }: ProfitChartProps) {
     const chartData = useMemo(() => {
         const dataMap = new Map<string, number>();
         if (summaries) {
             for (const summary of summaries) {
                  const monthName = format(new Date(summary.year, summary.month - 1), 'MMM', { locale: ptBR });
-                 dataMap.set(monthName, summary.totalProfit);
+                 const value = view === 'profit' ? summary.totalProfit : (summary.totalRevenue ?? 0);
+                 dataMap.set(monthName, value);
             }
         }
 
@@ -38,75 +45,74 @@ export function ProfitChart({ summaries, isLoading }: { summaries: MonthlySummar
             const monthName = format(date, 'MMM', { locale: ptBR });
             return {
                 name: monthName.charAt(0).toUpperCase() + monthName.slice(1),
-                profit: dataMap.get(monthName) ?? 0,
+                value: dataMap.get(monthName) ?? 0,
             };
         }).reverse();
 
-    }, [summaries]);
+    }, [summaries, view]);
+    
+    const chartConfig = {
+        profit: {
+            color: "hsl(var(--primary))",
+            gradientId: "colorProfit"
+        },
+        revenue: {
+            color: "hsl(var(--chart-2))",
+            gradientId: "colorRevenue"
+        }
+    }
+    
+    const currentConfig = chartConfig[view];
 
     if (isLoading) {
-        return (
-             <Card className="bg-card">
-                <CardHeader>
-                    <Skeleton className="h-6 w-1/3" />
-                    <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-[350px] w-full" />
-                </CardContent>
-            </Card>
-        );
+        return <Skeleton className="h-[350px] w-full" />;
     }
 
     return (
-        <Card className="h-full flex flex-col bg-card">
-            <CardHeader>
-                <CardTitle className="font-semibold text-lg text-foreground">Análise</CardTitle>
-                <CardDescription>Lucro dos itens vendidos nos últimos 6 meses.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow pl-2">
-                <div className="h-[350px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
-                            <defs>
-                                <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
-                                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                            <XAxis
-                                dataKey="name"
-                                stroke="hsl(var(--muted-foreground))"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                            />
-                            <YAxis
-                                stroke="hsl(var(--muted-foreground))"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={(value) => 
-                                    new Intl.NumberFormat('pt-BR', { 
-                                        notation: 'compact', 
-                                        compactDisplay: 'short' 
-                                    }).format(value as number)
-                                }
-                            />
-                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }} />
-                            <Area 
-                                type="monotone" 
-                                dataKey="profit" 
-                                stroke="hsl(var(--primary))"
-                                strokeWidth={2}
-                                fillOpacity={1} 
-                                fill="url(#colorProfit)" 
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
-            </CardContent>
-        </Card>
+        <div className="h-[350px] w-full -ml-4">
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <defs>
+                        <linearGradient id={chartConfig.profit.gradientId} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={chartConfig.profit.color} stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor={chartConfig.profit.color} stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id={chartConfig.revenue.gradientId} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={chartConfig.revenue.color} stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor={chartConfig.revenue.color} stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)" />
+                    <XAxis
+                        dataKey="name"
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                    />
+                    <YAxis
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => 
+                            new Intl.NumberFormat('pt-BR', { 
+                                notation: 'compact', 
+                                compactDisplay: 'short' 
+                            }).format(value as number)
+                        }
+                    />
+                    <Tooltip content={<CustomTooltip view={view} />} cursor={{ stroke: currentConfig.color, strokeWidth: 1, strokeDasharray: '3 3' }} />
+                    <Area 
+                        type="monotone" 
+                        dataKey="value"
+                        stroke={currentConfig.color}
+                        strokeWidth={2}
+                        fillOpacity={1} 
+                        fill={`url(#${currentConfig.gradientId})`}
+                    />
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>
     );
 }

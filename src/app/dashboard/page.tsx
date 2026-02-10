@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, doc, query, orderBy, limit, where } from 'firebase/firestore';
@@ -26,6 +26,7 @@ import {
     PiggyBank
 } from 'lucide-react';
 import { subMonths, format } from 'date-fns';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 function ChangeIndicator({ change, isPositive }: { change: number, isPositive: boolean }) {
     if (change === 0) {
@@ -63,6 +64,7 @@ export default function DashboardPage() {
     const router = useRouter();
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
+    const [chartView, setChartView] = useState<'profit' | 'revenue'>('profit');
 
     useEffect(() => {
         if (!isUserLoading && !user) {
@@ -424,20 +426,21 @@ export default function DashboardPage() {
                     <div className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl overflow-hidden">
                         
-                        <div className="p-6 border-b border-slate-800">
-                            <div className="flex items-center justify-between mb-2">
-                                <div>
-                                    <h3 className="text-xl font-bold mb-1">Receita</h3>
-                                    <p className="text-slate-400 text-sm">Este mês vs passado</p>
-                                </div>
-                                <button className="p-2 hover:bg-slate-800 rounded-xl transition-colors">
-                                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                                </button>
+                        <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                                <h3 className="text-xl font-bold mb-1">Análise de Performance</h3>
+                                <p className="text-slate-400 text-sm">Visualize o lucro ou faturamento dos últimos 6 meses.</p>
                             </div>
+                            <Tabs defaultValue="profit" onValueChange={(value) => setChartView(value as 'profit' | 'revenue')} className="w-full sm:w-fit">
+                                <TabsList className="bg-slate-800 grid w-full grid-cols-2">
+                                    <TabsTrigger value="profit">Lucro</TabsTrigger>
+                                    <TabsTrigger value="revenue">Faturamento</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
                         </div>
                         
                         <div className="p-6">
-                            <ProfitChart summaries={monthlySummaries} isLoading={areSummariesLoading} />
+                            <ProfitChart summaries={monthlySummaries} isLoading={areSummariesLoading} view={chartView} />
                         </div>
                     </div>
                     
