@@ -22,6 +22,15 @@ export type Item = {
   profit?: number;
 };
 
+export type WishlistItem = {
+  id: string;
+  userId: string;
+  itemName: string;
+  customerNotes?: string;
+  status: 'Open' | 'Found' | 'Archived';
+  createdAt: any; // Can be Timestamp from Firebase
+};
+
 // Represents the user profile document stored in Firestore
 export type UserProfile = {
   id: string;

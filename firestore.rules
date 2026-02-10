@@ -77,6 +77,14 @@ service cloud.firestore {
     function hasValidItemData(userId, itemId) {
       return request.resource.data.userId == userId && request.resource.data.id == itemId;
     }
+
+    /**
+     * On create, validates that the WishlistItem document's internal 'userId' and 'id' fields
+     * match the IDs in the document's path.
+     */
+    function hasValidWishlistItemData(userId, wishlistItemId) {
+      return request.resource.data.userId == userId && request.resource.data.id == wishlistItemId;
+    }
     
     // ----------------------------------------------------------------------
     // Collection Rules
@@ -110,6 +118,20 @@ service cloud.firestore {
       match /items/{itemId} {
         allow get, list, delete: if isOwner(userId);
         allow create: if isOwner(userId) && hasValidItemData(userId, itemId);
+        allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
+      }
+
+      /**
+       * @description Manages a customer wishlist for a user.
+       * @path /users/{userId}/wishlistItems/{wishlistItemId}
+       * @allow (create) User 'user_abc' creates a new wishlist item.
+       * @allow (list) User 'user_abc' lists all of their own wishlist items.
+       * @deny (get) User 'user_xyz' attempts to read another user's wishlist.
+       * @principle Enforces strict data ownership for private user notes.
+       */
+      match /wishlistItems/{wishlistItemId} {
+        allow get, list, delete: if isOwner(userId);
+        allow create: if isOwner(userId) && hasValidWishlistItemData(userId, wishlistItemId);
         allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
       }
 
