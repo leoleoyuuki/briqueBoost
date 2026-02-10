@@ -47,12 +47,12 @@ export default function WishlistPage() {
                         <div>
                             <h2 className="text-2xl font-bold mb-1 text-white">Lista de Desejos</h2>
                             <p className="text-slate-400 text-sm">
-                                Itens que seus clientes procuram.
+                                Itens que seus clientes procuram ({(wishlistItems ?? []).length} de 10).
                             </p>
                         </div>
                         
                         <div className="flex items-center gap-3">
-                            <AddWishlistItemDialog />
+                            <AddWishlistItemDialog items={wishlistItems ?? []} isLoading={areItemsLoading} />
                         </div>
                     </div>
                 </div>
