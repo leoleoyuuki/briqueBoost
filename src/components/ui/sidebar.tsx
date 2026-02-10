@@ -54,7 +54,7 @@ const SidebarProvider = React.forwardRef<
 >(
   (
     {
-      defaultOpen = true,
+      defaultOpen = false,
       open: openProp,
       onOpenChange: setOpenProp,
       className,
@@ -167,7 +167,7 @@ const Sidebar = React.forwardRef<
     if(isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile}>
-            <SheetContent side="left" className="w-[--sidebar-width-mobile] bg-card p-0 border-r-0" style={{'--sidebar-width-mobile': SIDEBAR_WIDTH_MOBILE} as React.CSSProperties}>
+            <SheetContent side="left" className="w-[--sidebar-width-mobile] bg-card p-0" style={{'--sidebar-width-mobile': SIDEBAR_WIDTH_MOBILE} as React.CSSProperties}>
                  <SheetTitle className="sr-only">Menu</SheetTitle>
                  <div ref={ref} className={cn("flex h-full flex-col", className)} {...props}>{children}</div>
             </SheetContent>
