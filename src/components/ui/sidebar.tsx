@@ -3,15 +3,12 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { Menu } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import {
   Tooltip,
   TooltipContent,
@@ -171,6 +168,7 @@ const Sidebar = React.forwardRef<
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile}>
             <SheetContent side="left" className="w-[--sidebar-width-mobile] bg-card p-0 border-r-0" style={{'--sidebar-width-mobile': SIDEBAR_WIDTH_MOBILE} as React.CSSProperties}>
+                 <SheetTitle className="sr-only">Menu</SheetTitle>
                  <div ref={ref} className={cn("flex h-full flex-col", className)} {...props}>{children}</div>
             </SheetContent>
         </Sheet>
@@ -215,7 +213,7 @@ const SidebarTrigger = React.forwardRef<
         }}
         {...props}
         >
-        <PanelLeft />
+        <Menu />
         <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
@@ -230,7 +228,7 @@ const SidebarHeader = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex items-center h-16 shrink-0", "group-data-[state=expanded]/sidebar-wrapper:p-4", "group-data-[state=collapsed]/sidebar-wrapper:px-3.5", className)}
+      className={cn("flex items-center h-20 shrink-0", "group-data-[state=expanded]/sidebar-wrapper:p-4", "group-data-[state=collapsed]/sidebar-wrapper:px-3.5", className)}
       {...props}
     />
   )
@@ -245,7 +243,7 @@ const SidebarFooter = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="footer"
-      className={cn("flex flex-col p-2 mt-auto", className)}
+      className={cn("flex flex-col p-4 mt-auto", className)}
       {...props}
     />
   )
@@ -259,7 +257,7 @@ const SidebarMenu = React.forwardRef<
   <ul
     ref={ref}
     data-sidebar="menu"
-    className={cn("flex w-full min-w-0 flex-col", "group-data-[state=expanded]/sidebar-wrapper:gap-1", "group-data-[state=collapsed]/sidebar-wrapper:gap-2", className)}
+    className={cn("flex w-full min-w-0 flex-col px-2", "group-data-[state=expanded]/sidebar-wrapper:gap-1", "group-data-[state=collapsed]/sidebar-wrapper:gap-2", className)}
     {...props}
   />
 ))
