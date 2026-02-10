@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser, useFirestore, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
-import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, increment } from 'firebase/firestore';
 import type { Item, WithId } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
@@ -76,6 +76,7 @@ export function ItemForm({ item }: ItemFormProps) {
             // Add new item
             const itemsCollection = collection(firestore, 'users', user.uid, 'items');
             const newDocRef = doc(itemsCollection); // Create ref with new ID
+            const userRef = doc(firestore, 'users', user.uid);
 
             const newItemData = {
                 ...commonData,
@@ -94,7 +95,8 @@ export function ItemForm({ item }: ItemFormProps) {
                 imageHint: 'new item'
             };
             
-            setDocumentNonBlocking(newDocRef, newItemData, {}); // Use setDoc to create
+            setDocumentNonBlocking(newDocRef, newItemData, {});
+            updateDocumentNonBlocking(userRef, { itemsInStock: increment(1) });
             
             toast({ title: 'Item adicionado com sucesso!'});
             router.push('/dashboard');

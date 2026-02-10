@@ -29,11 +29,21 @@ const formatDate = (date: any) => {
 interface InventoryTableProps {
     items: Item[];
     isLoading: boolean;
+    isPaginated?: boolean;
+    hasNextPage?: boolean;
+    hasPrevPage?: boolean;
+    onNextPage?: () => void;
+    onPrevPage?: () => void;
 }
 
 export function InventoryTable({ 
     items, 
-    isLoading
+    isLoading,
+    isPaginated = false,
+    hasNextPage,
+    hasPrevPage,
+    onNextPage,
+    onPrevPage,
 }: InventoryTableProps) {
   
   const renderEmptyState = () => (
@@ -112,6 +122,28 @@ export function InventoryTable({
             </Table>
         ) : (
             renderEmptyState()
+        )}
+         {isPaginated && items.length > 0 && (
+            <div className="flex items-center justify-end space-x-2 py-4 px-4 border-t border-slate-800">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onPrevPage}
+                    disabled={!hasPrevPage || isLoading}
+                    className="bg-slate-800 hover:bg-slate-700 border-slate-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Anterior
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onNextPage}
+                    disabled={!hasNextPage || isLoading}
+                    className="bg-slate-800 hover:bg-slate-700 border-slate-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Próximo
+                </Button>
+            </div>
         )}
     </div>
   );

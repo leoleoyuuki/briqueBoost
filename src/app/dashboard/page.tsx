@@ -2,9 +2,9 @@
 
 import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
-import type { Item } from '@/lib/types';
+import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, doc, query, orderBy, limit } from 'firebase/firestore';
+import type { Item, UserProfile } from '@/lib/types';
 import { StatCards } from '@/components/dashboard/stat-cards';
 import { InventoryTable } from '@/components/dashboard/inventory-table';
 import { ProfitChart } from '@/components/dashboard/profit-chart';
@@ -36,45 +36,62 @@ export default function DashboardPage() {
         }
     }, [isUserLoading, user, router]);
 
-    const itemsQuery = useMemoFirebase(() => {
+    const userProfileRef = useMemoFirebase(() => {
+        if (!user) return null;
+        return doc(firestore, 'users', user.uid);
+    }, [firestore, user]);
+
+    const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
+
+    // Query for all items for charts
+    const allItemsQuery = useMemoFirebase(() => {
         if (!user) return null;
         return collection(firestore, 'users', user.uid, 'items');
     }, [firestore, user]);
+    const { data: allItems, isLoading: areAllItemsLoading } = useCollection<Item>(allItemsQuery);
 
-    const { data: items, isLoading: areItemsLoading } = useCollection<Item>(itemsQuery);
+    // Query for recent items for the table
+    const recentItemsQuery = useMemoFirebase(() => {
+        if (!user) return null;
+        return query(collection(firestore, 'users', user.uid, 'items'), orderBy('purchaseDate', 'desc'), limit(5));
+    }, [firestore, user]);
+    const { data: recentItems, isLoading: areRecentItemsLoading } = useCollection<Item>(recentItemsQuery);
 
-    const sortedItems = useMemo(() => {
-        if (!items) return [];
-        return [...items].sort((a, b) => {
+    const sortedRecentItems = useMemo(() => {
+        if (!recentItems) return [];
+        return [...recentItems].sort((a, b) => {
             const dateA = a.purchaseDate?.toDate() ?? 0;
             const dateB = b.purchaseDate?.toDate() ?? 0;
             if (!dateA) return 1;
             if (!dateB) return -1;
             return dateB.getTime() - dateA.getTime();
         });
-    }, [items]);
-
+    }, [recentItems]);
+    
     const stats = useMemo(() => {
-        if (!items) {
+        if (!userProfile) {
             return { totalProfit: 0, itemsInStock: 0, averageProfitMargin: 0, totalItemsSold: 0 };
         }
-        const soldItems = items.filter(item => item.status === 'Sold' && typeof item.salePrice === 'number');
-        const totalProfit = soldItems.reduce((acc, item) => acc + (item.profit ?? (item.salePrice! - item.purchasePrice)), 0);
-        const itemsInStock = items.filter(item => item.status === 'In Stock').length;
-        const totalPurchasePriceOfSoldItems = soldItems.reduce((acc, item) => acc + item.purchasePrice, 0);
-        const averageProfitMargin = totalPurchasePriceOfSoldItems > 0
-            ? totalProfit / totalPurchasePriceOfSoldItems
+        const totalProfit = userProfile.totalProfit ?? 0;
+        const totalItemsSold = userProfile.totalItemsSold ?? 0;
+        const itemsInStock = userProfile.itemsInStock ?? 0;
+        const totalInvestmentSold = userProfile.totalInvestmentSold ?? 0;
+        
+        const averageProfitMargin = totalInvestmentSold > 0
+            ? totalProfit / totalInvestmentSold
             : 0;
 
         return {
             totalProfit,
             itemsInStock,
             averageProfitMargin,
-            totalItemsSold: soldItems.length,
+            totalItemsSold,
         }
-    }, [items]);
+    }, [userProfile]);
 
-    if (isUserLoading || !user) {
+    const isLoading = isUserLoading || isProfileLoading;
+
+    if (isLoading || !user) {
         return (
             <div className="min-h-screen bg-slate-950 p-6 md:p-8">
                 <div className="max-w-[1800px] mx-auto space-y-6">
@@ -103,7 +120,6 @@ export default function DashboardPage() {
         <div className="min-h-screen bg-slate-950 text-white">
             <div className="max-w-[1800px] mx-auto p-6 md:p-8 space-y-6">
                 
-                {/* 🎯 HEADER ULTRA MODERNO */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
                     <div>
                         <p className="text-slate-400 text-sm font-medium mb-2">
@@ -132,18 +148,14 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* 💎 CARDS DE ESTATÍSTICAS MODERNOS */}
                 <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
                     
-                    {/* Card 1: Lucro Total */}
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         
-                        {/* Glow effect decorativo */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
                         
                         <div className="relative">
-                            {/* Header com ícone */}
                             <div className="flex items-center justify-between mb-6">
                                 <div className="p-3 bg-blue-500/10 rounded-2xl">
                                     <DollarSign className="w-6 h-6 text-blue-400" strokeWidth={2.5} />
@@ -153,7 +165,6 @@ export default function DashboardPage() {
                                 </button>
                             </div>
                             
-                            {/* Valor principal */}
                             <div className="mb-4">
                                 <p className="text-slate-400 text-sm font-medium mb-2">
                                     Receita Total
@@ -168,7 +179,6 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             
-                            {/* Badge de tendência */}
                             <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 
                                           border border-emerald-500/20 rounded-xl w-fit">
                                 <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
@@ -178,7 +188,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Card 2: Total de Pedidos */}
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         
@@ -212,7 +221,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Card 3: Total de Visitantes */}
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         
@@ -246,7 +254,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Card 4: Lucro Líquido */}
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         
@@ -281,14 +288,11 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* 📊 SEÇÃO DE GRÁFICOS */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     
-                    {/* Gráfico Principal - Revenue */}
                     <div className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl overflow-hidden">
                         
-                        {/* Header do gráfico */}
                         <div className="p-6 border-b border-slate-800">
                             <div className="flex items-center justify-between mb-2">
                                 <div>
@@ -301,13 +305,11 @@ export default function DashboardPage() {
                             </div>
                         </div>
                         
-                        {/* Gráfico */}
                         <div className="p-6">
-                            <ProfitChart items={items} isLoading={areItemsLoading} />
+                            <ProfitChart items={allItems} isLoading={areAllItemsLoading} />
                         </div>
                     </div>
                     
-                    {/* Vendas por Categoria */}
                     <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl overflow-hidden">
                         
@@ -324,15 +326,13 @@ export default function DashboardPage() {
                         </div>
                         
                         <div className="p-6">
-                            <ItemSummary items={items} isLoading={areItemsLoading} />
+                            <ItemSummary items={allItems} isLoading={areAllItemsLoading} />
                         </div>
                     </div>
                 </div>
 
-                {/* 📋 SEÇÃO INFERIOR COM INFO CARDS */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
                     
-                    {/* Card de Pedidos Pendentes */}
                     <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
                                   transition-all duration-300">
@@ -360,7 +360,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Card de Clientes */}
                     <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
                                   transition-all duration-300">
@@ -388,7 +387,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Placeholder cards */}
                     <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
                                   transition-all duration-300">
@@ -454,16 +452,14 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* 📋 LISTA DE ITENS */}
                 <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
                     
-                    {/* Header da tabela */}
                     <div className="p-6 border-b border-slate-800">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
-                                <h2 className="text-2xl font-bold mb-1">Lista de Itens</h2>
+                                <h2 className="text-2xl font-bold mb-1">Itens Recentes</h2>
                                 <p className="text-slate-400 text-sm">
-                                    {sortedItems.length} {sortedItems.length === 1 ? 'item' : 'itens'}
+                                    {sortedRecentItems.length} {sortedRecentItems.length === 1 ? 'item' : 'itens'}
                                 </p>
                             </div>
                             
@@ -486,11 +482,10 @@ export default function DashboardPage() {
                         </div>
                     </div>
                     
-                    {/* Tabela */}
                     <div className="overflow-hidden">
                         <InventoryTable 
-                            items={sortedItems} 
-                            isLoading={areItemsLoading} 
+                            items={sortedRecentItems} 
+                            isLoading={areRecentItemsLoading} 
                         />
                     </div>
                 </div>

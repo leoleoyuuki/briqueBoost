@@ -32,6 +32,22 @@
           "type": "string",
           "description": "Timestamp indicating when the AI usage count was last reset.",
           "format": "date-time"
+        },
+        "totalProfit": {
+            "type": "number",
+            "description": "The total profit from all sold items."
+        },
+        "totalItemsSold": {
+            "type": "number",
+            "description": "The total number of items sold."
+        },
+        "itemsInStock": {
+            "type": "number",
+            "description": "The total number of items currently in stock."
+        },
+        "totalInvestmentSold": {
+            "type": "number",
+            "description": "The total purchase price of all sold items."
         }
       },
       "required": [

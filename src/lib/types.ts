@@ -30,6 +30,10 @@ export type UserProfile = {
   createdAt: any; // Can be Timestamp from Firebase
   aiUsageCount: number;
   aiUsageLastReset: any; // Can be Timestamp
+  totalProfit?: number;
+  totalItemsSold?: number;
+  itemsInStock?: number;
+  totalInvestmentSold?: number;
 };
 
 // Represents the mock user data structure, not used with live data.

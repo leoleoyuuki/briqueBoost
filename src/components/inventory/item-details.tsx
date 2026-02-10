@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { Item, WithId } from "@/lib/types";
 import { useUser, useFirestore, updateDocumentNonBlocking } from '@/firebase';
-import { doc, serverTimestamp } from 'firebase/firestore';
+import { doc, serverTimestamp, increment } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -55,17 +55,26 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
       }
 
       const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
+      const userRef = doc(firestore, 'users', user.uid);
       const profit = price - item.purchasePrice;
 
-      const updatedData = {
+      const updatedItemData = {
           status: 'Sold' as const,
           salePrice: price,
           saleDate: serverTimestamp(),
           profit: profit,
       };
 
+      const updatedUserData = {
+        itemsInStock: increment(-1),
+        totalItemsSold: increment(1),
+        totalProfit: increment(profit),
+        totalInvestmentSold: increment(item.purchasePrice),
+      };
+
       try {
-        updateDocumentNonBlocking(itemRef, updatedData);
+        updateDocumentNonBlocking(itemRef, updatedItemData);
+        updateDocumentNonBlocking(userRef, updatedUserData);
         toast({
             title: 'Venda Confirmada!',
             description: `O item ${item.name} foi marcado como vendido.`,

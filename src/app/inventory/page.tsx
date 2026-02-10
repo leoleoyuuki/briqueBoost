@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, query, orderBy, limit, startAfter, endBefore, limitToLast, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { Item } from '@/lib/types';
 import { InventoryTable } from '@/components/dashboard/inventory-table';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,10 +11,17 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Plus, Download } from 'lucide-react';
 
+const PAGE_SIZE = 10;
+
 export default function InventoryPage() {
     const router = useRouter();
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
+
+    const [page, setPage] = useState(1);
+    const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+    const [firstDoc, setFirstDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+    const [isNextPage, setIsNextPage] = useState(true);
 
     useEffect(() => {
         if (!isUserLoading && !user) {
@@ -24,21 +31,42 @@ export default function InventoryPage() {
 
     const itemsQuery = useMemoFirebase(() => {
         if (!user) return null;
-        return collection(firestore, 'users', user.uid, 'items');
-    }, [firestore, user]);
+        const baseQuery = collection(firestore, 'users', user.uid, 'items');
+        
+        if (isNextPage) {
+            const constraints = [orderBy('purchaseDate', 'desc'), limit(PAGE_SIZE)];
+            if (lastDoc) {
+                constraints.splice(1, 0, startAfter(lastDoc));
+            }
+            return query(baseQuery, ...constraints);
+        } else {
+             const constraints = [orderBy('purchaseDate', 'desc'), endBefore(firstDoc), limitToLast(PAGE_SIZE)];
+             return query(baseQuery, ...constraints);
+        }
+    }, [firestore, user, lastDoc, firstDoc, isNextPage]);
 
-    const { data: items, isLoading: areItemsLoading } = useCollection<Item>(itemsQuery);
+    const { data: items, isLoading: areItemsLoading, snapshots } = useCollection<Item>(itemsQuery);
 
-    const sortedItems = useMemo(() => {
-        if (!items) return [];
-        return [...items].sort((a, b) => {
-            const dateA = a.purchaseDate?.toDate() ?? 0;
-            const dateB = b.purchaseDate?.toDate() ?? 0;
-            if (!dateA) return 1;
-            if (!dateB) return -1;
-            return dateB.getTime() - a.purchaseDate.toDate().getTime();
-        });
-    }, [items]);
+    const handleNextPage = () => {
+        if (snapshots && snapshots.length === PAGE_SIZE) {
+            setLastDoc(snapshots[snapshots.length - 1]);
+            setFirstDoc(snapshots[0]);
+            setPage(p => p + 1);
+            setIsNextPage(true);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (page > 1) {
+            setLastDoc(null); // This will be tricky, let's simplify for now
+            setFirstDoc(firstDoc);
+            setPage(p => p - 1);
+            setIsNextPage(false);
+        }
+    };
+
+    const hasNextPage = snapshots ? snapshots.length === PAGE_SIZE : false;
+    const hasPrevPage = page > 1;
 
     if (isUserLoading || !user) {
         return (
@@ -60,7 +88,7 @@ export default function InventoryPage() {
                         <div>
                             <h2 className="text-2xl font-bold mb-1 text-white">Inventário Completo</h2>
                             <p className="text-slate-400 text-sm">
-                                {sortedItems.length} {sortedItems.length === 1 ? 'item no total' : 'itens no total'}
+                                Itens no seu inventário (Página {page})
                             </p>
                         </div>
                         
@@ -85,8 +113,13 @@ export default function InventoryPage() {
                 
                 <div className="overflow-hidden">
                     <InventoryTable 
-                        items={sortedItems} 
+                        items={items ?? []} 
                         isLoading={areItemsLoading}
+                        isPaginated={true}
+                        hasNextPage={hasNextPage}
+                        hasPrevPage={hasPrevPage}
+                        onNextPage={handleNextPage}
+                        onPrevPage={handlePrevPage}
                     />
                 </div>
             </div>
