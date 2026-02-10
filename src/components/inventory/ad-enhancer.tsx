@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { doc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore, useUser, updateDocumentNonBlocking, useDoc, useMemoFirebase } from '@/firebase';
 import type { Item, UserProfile } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -30,15 +29,15 @@ function ResultDisplay({ title, content, onCopy }: { title: string; content: str
     return (
         <div className="space-y-2">
             <div className="flex justify-between items-center">
-                <h4 className="font-semibold">{title}</h4>
+                <h4 className="font-semibold text-white">{title}</h4>
                 {content && (
-                    <Button variant="ghost" size="icon" onClick={handleCopy}>
-                        {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    <Button variant="ghost" size="icon" onClick={handleCopy} className="text-slate-400 hover:bg-slate-800 hover:text-white">
+                        {copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
                         <span className="sr-only">Copiar</span>
                     </Button>
                 )}
             </div>
-            <p className="text-sm text-muted-foreground bg-secondary/50 p-3 rounded-md min-h-[60px] whitespace-pre-wrap">{content}</p>
+            <div className="text-sm text-slate-300 bg-slate-800/50 p-4 rounded-xl min-h-[80px] whitespace-pre-wrap border border-slate-700">{content}</div>
         </div>
     );
 }
@@ -145,31 +144,34 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
   const canUseAi = (userProfile?.aiUsageCount ?? 0) < aiLimit;
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-accent" />
-            <CardTitle className="font-headline text-xl">Assistente de Anúncios IA</CardTitle>
+    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl">
+      <div className="p-6">
+        <div className="flex items-center gap-3">
+            <Sparkles className="h-6 w-6 text-blue-400" />
+            <h2 className="font-headline text-xl font-bold text-white">Assistente de Anúncios IA</h2>
         </div>
-        <CardDescription>
+        <p className="text-slate-400 mt-1">
           Gere títulos e descrições otimizados para vender mais rápido.
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
+        <div className="p-6 pt-0 space-y-4">
           <div className="grid gap-2">
-            <Label htmlFor="itemDetails">Detalhes Adicionais (opcional)</Label>
+            <Label htmlFor="itemDetails" className="text-slate-300">Detalhes Adicionais (opcional)</Label>
             <Textarea
               id="itemDetails"
               value={itemDetails}
               onChange={(e) => setItemDetails(e.target.value)}
               placeholder="Ex: Marca, modelo, cor, defeitos, qualidades, acessórios inclusos..."
+              className="bg-slate-800 border-slate-700 rounded-xl min-h-[100px]"
             />
-            <p className="text-xs text-muted-foreground">Quanto mais detalhes, melhor será o resultado da IA.</p>
+            <p className="text-xs text-slate-500">Quanto mais detalhes, melhor será o resultado da IA.</p>
           </div>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button type="submit" disabled={isLoading || isProfileLoading || !canUseAi}>
+        </div>
+        <div className="px-6 pb-6 flex justify-end">
+          <Button type="submit" disabled={isLoading || isProfileLoading || !canUseAi}
+                  className="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all duration-200 flex items-center gap-2 font-medium">
             {isLoading ? (
               <>
                 <Bot className="mr-2 h-4 w-4 animate-spin" />
@@ -182,20 +184,20 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
               </>
             )}
           </Button>
-        </CardFooter>
+        </div>
       </form>
 
-      {(isLoading || result) && <Separator className="my-4" />}
+      {(isLoading || result) && <Separator className="bg-slate-800" />}
 
       {isLoading && (
           <div className="p-6 space-y-6">
               <div className="space-y-2">
-                <Skeleton className="h-5 w-1/4" />
-                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-5 w-1/4 bg-slate-800 rounded-md" />
+                <Skeleton className="h-20 w-full bg-slate-800 rounded-xl" />
               </div>
               <div className="space-y-2">
-                <Skeleton className="h-5 w-1/4" />
-                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-5 w-1/4 bg-slate-800 rounded-md" />
+                <Skeleton className="h-24 w-full bg-slate-800 rounded-xl" />
               </div>
           </div>
       )}
@@ -211,17 +213,18 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
                  <ResultDisplay title="Descrição Aprimorada" content={result.enhancedDescription} onCopy={handleCopyToClipboard} />
             </div>
             <div>
-                <h4 className="font-semibold mb-2">💡 Raciocínio da IA</h4>
-                <p className="text-sm text-muted-foreground border-l-2 border-accent pl-3 italic">{result.reasoning}</p>
+                <h4 className="font-semibold mb-2 text-white">💡 Raciocínio da IA</h4>
+                <p className="text-sm text-slate-400 border-l-2 border-blue-500 pl-4 italic">{result.reasoning}</p>
             </div>
             <div className="flex justify-end pt-4">
-                <Button onClick={handleUseEnhancedCopy} variant="secondary">
+                <Button onClick={handleUseEnhancedCopy} 
+                        className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-xl transition-all duration-200 flex items-center gap-2 font-medium text-sm">
                   <Save className="mr-2 h-4 w-4" />
                   Usar estas versões
                 </Button>
             </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

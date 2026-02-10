@@ -22,7 +22,7 @@ function getFriendlyAuthErrorMessage(errorCode: string): string {
     case AuthErrorCodes.INVALID_LOGIN_CREDENTIALS:
       return 'A senha ou o e-mail estão incorretos. Por favor, tente novamente.';
     case AuthErrorCodes.TOO_MANY_ATTEMPTS_TRY_LATER:
-      return 'O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login. Tente novamente mais tarde.';
+      return 'O acesso a esta conta foi temporariamente desativado due a muitas tentativas de login. Tente novamente mais tarde.';
     default:
       return 'Ocorreu um erro desconhecido durante o login. Por favor, tente novamente.';
   }
@@ -54,10 +54,10 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleLogin}>
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl">Acesse sua conta</CardTitle>
-          <CardDescription>Bem-vindo de volta! Faça login para continuar.</CardDescription>
+      <Card className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl border-slate-800 rounded-3xl">
+        <CardHeader className="text-center">
+          <CardTitle className="font-headline text-2xl text-slate-100">Acesse sua conta</CardTitle>
+          <CardDescription className="text-slate-400">Bem-vindo de volta! Faça login para continuar.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           {error && (
@@ -68,21 +68,23 @@ export function LoginForm() {
             </Alert>
           )}
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="seu@email.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Label htmlFor="email" className="text-slate-400">Email</Label>
+            <Input id="email" name="email" type="email" placeholder="seu@email.com" required value={email} onChange={(e) => setEmail(e.target.value)} 
+                   className="bg-slate-800 border-slate-700 rounded-xl h-11" />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input id="password" name="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Label htmlFor="password" className="text-slate-400">Senha</Label>
+            <Input id="password" name="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} 
+                   className="bg-slate-800 border-slate-700 rounded-xl h-11" />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
+          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-11 text-base font-medium" disabled={isLoading}>
             {isLoading ? 'Entrando...' : 'Entrar'}
           </Button>
-          <div className="text-center text-sm">
+          <div className="text-center text-sm text-slate-400">
             Não tem uma conta?{" "}
-            <Link href="/signup" className="underline text-primary">
+            <Link href="/signup" className="underline text-blue-400 hover:text-blue-300">
               Cadastre-se
             </Link>
           </div>

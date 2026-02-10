@@ -41,14 +41,14 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar className='hidden lg:flex lg:flex-col'>
-      <SidebarHeader className='p-4'>
-        <div className="flex items-center gap-3">
-          <Logo className="w-8 h-8 text-primary" />
-          <h2 className="text-xl font-bold text-foreground">
+    <Sidebar className='hidden lg:flex lg:flex-col bg-slate-900/50 backdrop-blur-xl border-r border-slate-800'>
+      <SidebarHeader className='p-4 h-20'>
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <Logo className="w-8 h-8 text-blue-500" />
+          <h2 className="text-xl font-bold text-white font-headline">
             BriqueBoost
           </h2>
-        </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarMenu className="flex-1 p-4 space-y-2">
@@ -59,9 +59,9 @@ export function AppSidebar() {
                 asChild
                 isActive={isActive(item.href)}
                 className={cn(
-                    "w-full justify-start h-10",
-                    isActive(item.href) && "bg-primary/10 text-primary",
-                    !isActive(item.href) && "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                    "w-full justify-start h-11 rounded-xl text-base",
+                    isActive(item.href) && "bg-blue-600 text-white font-semibold",
+                    !isActive(item.href) && "text-slate-400 hover:bg-slate-800 hover:text-white"
                 )}
               >
                 <span>
@@ -75,15 +75,7 @@ export function AppSidebar() {
       </SidebarMenu>
 
       <SidebarFooter className="p-4 space-y-4">
-         {/* <div className='p-4 rounded-lg bg-card border'>
-            <h3 className='font-semibold'>Obtenha análises detalhadas para obter ajuda</h3>
-            <p className='text-sm text-muted-foreground'>Atualize para o Pro</p>
-            <Button size='sm' className='w-full mt-2'>Atualizar</Button>
-         </div>
-         <div className='flex items-center justify-between'>
-            <Label htmlFor='dark-mode-toggle'>Modo Escuro</Label>
-            <Switch id="dark-mode-toggle" />
-         </div> */}
+        {/* Footer content can be added here */}
       </SidebarFooter>
     </Sidebar>
   );

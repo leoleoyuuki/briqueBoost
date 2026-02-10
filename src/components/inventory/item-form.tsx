@@ -7,14 +7,6 @@ import { useUser, useFirestore, setDocumentNonBlocking, updateDocumentNonBlockin
 import { collection, doc, serverTimestamp } from 'firebase/firestore';
 import type { Item, WithId } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -115,35 +107,39 @@ export function ItemForm({ item }: ItemFormProps) {
     }
   };
 
+  const inputStyle = "bg-slate-800 border-slate-700 rounded-xl h-12 text-base";
+
   return (
     <form onSubmit={handleSubmit}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">{item ? 'Editar Item' : 'Adicionar Novo Item'}</CardTitle>
-          <CardDescription>
+      <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl">
+        <div className="p-6 md:p-8 border-b border-slate-800">
+          <h2 className="font-headline text-xl font-bold text-white">{item ? 'Editar Item' : 'Adicionar Novo Item'}</h2>
+          <p className="text-slate-400 mt-1">
             {item ? 'Atualize os detalhes do seu item.' : 'Preencha os detalhes do item que você adquiriu.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          </p>
+        </div>
+        <div className="p-6 md:p-8 grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div className="grid gap-2">
-                <Label htmlFor="name">Nome do Item</Label>
-                <Input id="name" name="name" placeholder="Ex: Cadeira de Escritório" value={formData.name} onChange={handleChange} required />
+                <Label htmlFor="name" className="text-slate-400">Nome do Item</Label>
+                <Input id="name" name="name" placeholder="Ex: Cadeira de Escritório" value={formData.name} onChange={handleChange} required 
+                       className={inputStyle} />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="purchasePrice">Preço de Compra (R$)</Label>
-                <Input id="purchasePrice" name="purchasePrice" type="number" step="0.01" placeholder="Ex: 150.00" value={formData.purchasePrice} onChange={handleChange} required />
+                <Label htmlFor="purchasePrice" className="text-slate-400">Preço de Compra (R$)</Label>
+                <Input id="purchasePrice" name="purchasePrice" type="number" step="0.01" placeholder="Ex: 150.00" value={formData.purchasePrice} onChange={handleChange} required 
+                       className={inputStyle} />
               </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="grid gap-2">
-                  <Label htmlFor="condition">Condição</Label>
+                  <Label htmlFor="condition" className="text-slate-400">Condição</Label>
                   <Select name="condition" value={formData.condition} onValueChange={handleSelectChange}>
-                    <SelectTrigger>
+                    <SelectTrigger className={inputStyle}>
                         <SelectValue placeholder="Selecione a condição" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-slate-900 border-slate-700">
                         <SelectItem value="New">Novo</SelectItem>
                         <SelectItem value="Used - Like New">Usado - Como Novo</SelectItem>
                         <SelectItem value="Used - Good">Usado - Bom</SelectItem>
@@ -153,30 +149,33 @@ export function ItemForm({ item }: ItemFormProps) {
                   </Select>
               </div>
               <div className="grid gap-2">
-                  <Label htmlFor="source">Fonte de Aquisição</Label>
-                  <Input id="source" name="source" placeholder="Ex: Brechó, Amigo, Marketplace" value={formData.source} onChange={handleChange} />
+                  <Label htmlFor="source" className="text-slate-400">Fonte de Aquisição</Label>
+                  <Input id="source" name="source" placeholder="Ex: Brechó, Amigo, Marketplace" value={formData.source} onChange={handleChange} 
+                         className={inputStyle} />
               </div>
           </div>
           
           <div className="grid gap-2">
-            <Label htmlFor="initialTitle">Título Inicial do Anúncio</Label>
-            <Input id="initialTitle" name="initialTitle" placeholder="O título que você usaria" value={formData.initialTitle} onChange={handleChange} />
+            <Label htmlFor="initialTitle" className="text-slate-400">Título Inicial do Anúncio</Label>
+            <Input id="initialTitle" name="initialTitle" placeholder="O título que você usaria" value={formData.initialTitle} onChange={handleChange} 
+                   className={inputStyle} />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="initialDescription">Descrição Inicial do Anúncio</Label>
-            <Textarea id="initialDescription" name="initialDescription" placeholder="Descreva o item, seus detalhes e condição." value={formData.initialDescription} onChange={handleChange} />
+            <Label htmlFor="initialDescription" className="text-slate-400">Descrição Inicial do Anúncio</Label>
+            <Textarea id="initialDescription" name="initialDescription" placeholder="Descreva o item, seus detalhes e condição." value={formData.initialDescription} onChange={handleChange} 
+                      className={`${inputStyle} min-h-[100px]`} />
           </div>
-        </CardContent>
-        <CardFooter className="justify-end gap-2">
+        </div>
+        <div className="p-6 md:p-8 flex justify-end gap-3 border-t border-slate-800">
           <Link href={item ? `/inventory/${item.id}` : '/dashboard'} passHref>
-            <Button variant="outline" type="button">Cancelar</Button>
+            <Button variant="outline" type="button" className="px-6 py-3 bg-slate-800 hover:bg-slate-700 border-slate-700 text-white rounded-xl transition-all duration-200 font-medium text-sm h-auto">Cancelar</Button>
           </Link>
-          <Button type="submit" disabled={isLoading || isAuthLoading}>
+          <Button type="submit" disabled={isLoading || isAuthLoading} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all duration-200 font-medium text-sm h-auto">
             {isLoading ? (item ? 'Salvando...' : 'Adicionando...') : (item ? 'Salvar Alterações' : 'Adicionar Item')}
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </form>
   );
 }

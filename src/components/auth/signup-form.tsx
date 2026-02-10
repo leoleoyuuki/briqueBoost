@@ -71,10 +71,10 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSignup}>
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl">Crie sua conta</CardTitle>
-          <CardDescription>É rápido e fácil. Vamos começar!</CardDescription>
+      <Card className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl border-slate-800 rounded-3xl">
+        <CardHeader className="text-center">
+          <CardTitle className="font-headline text-2xl text-slate-100">Crie sua conta</CardTitle>
+          <CardDescription className="text-slate-400">É rápido e fácil. Vamos começar!</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           {error && (
@@ -85,26 +85,29 @@ export function SignupForm() {
             </Alert>
           )}
           <div className="grid gap-2">
-            <Label htmlFor="name">Nome</Label>
-            <Input id="name" name="name" placeholder="Seu nome completo" required value={name} onChange={(e) => setName(e.target.value)} />
+            <Label htmlFor="name" className="text-slate-400">Nome</Label>
+            <Input id="name" name="name" placeholder="Seu nome completo" required value={name} onChange={(e) => setName(e.target.value)} 
+                   className="bg-slate-800 border-slate-700 rounded-xl h-11" />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="seu@email.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Label htmlFor="email" className="text-slate-400">Email</Label>
+            <Input id="email" name="email" type="email" placeholder="seu@email.com" required value={email} onChange={(e) => setEmail(e.target.value)} 
+                   className="bg-slate-800 border-slate-700 rounded-xl h-11" />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input id="password" name="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Label htmlFor="password" className="text-slate-400">Senha</Label>
+            <Input id="password" name="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} 
+                   className="bg-slate-800 border-slate-700 rounded-xl h-11" />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-11 text-base font-medium" disabled={isLoading}>
                 {isLoading ? 'Criando conta...' : 'Criar conta'}
             </Button>
-            <div className="text-center text-sm">
+            <div className="text-center text-sm text-slate-400">
                 Já tem uma conta?{" "}
-                <Link href="/" className="underline text-primary">
-                Faça login
+                <Link href="/" className="underline text-blue-400 hover:text-blue-300">
+                  Faça login
                 </Link>
             </div>
         </CardFooter>

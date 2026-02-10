@@ -28,25 +28,27 @@ export default function EditItemPage() {
     }
   }, [isUserLoading, user, router]);
 
-  if (isUserLoading || isItemLoading || !user) {
-    return (
-        <Card>
-            <CardContent className="p-6">
-                <div className="grid gap-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-10 w-full" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-10 w-full" />
-                    </div>
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-20 w-full" />
+  const renderSkeleton = () => (
+    <div className="p-6 md:p-8">
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-8">
+            <div className="grid gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Skeleton className="h-12 w-full bg-slate-800 rounded-xl" />
+                    <Skeleton className="h-12 w-full bg-slate-800 rounded-xl" />
                 </div>
-            </CardContent>
-        </Card>
-    );
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Skeleton className="h-12 w-full bg-slate-800 rounded-xl" />
+                    <Skeleton className="h-12 w-full bg-slate-800 rounded-xl" />
+                </div>
+                <Skeleton className="h-12 w-full bg-slate-800 rounded-xl" />
+                <Skeleton className="h-24 w-full bg-slate-800 rounded-xl" />
+            </div>
+        </div>
+    </div>
+  );
+
+  if (isUserLoading || isItemLoading || !user) {
+    return renderSkeleton();
   }
 
   if (!item) {
@@ -54,5 +56,9 @@ export default function EditItemPage() {
     return null;
   }
 
-  return <ItemForm item={item} />;
+  return (
+    <div className="p-6 md:p-8">
+      <ItemForm item={item} />
+    </div>
+  );
 }

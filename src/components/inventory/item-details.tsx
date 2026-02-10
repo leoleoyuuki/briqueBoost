@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
-import { Pencil } from 'lucide-react';
+import { Pencil, Dot } from 'lucide-react';
 
 const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return '-';
@@ -79,67 +79,75 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
   const profit = item.status === 'Sold' && item.salePrice ? item.salePrice - item.purchasePrice : null;
 
   return (
-    <Card className="overflow-hidden">
-        <CardHeader>
+    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+        <div className="p-6 border-b border-slate-800">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <CardTitle className="font-headline text-xl">{item.name}</CardTitle>
-                <CardDescription>{item.initialTitle}</CardDescription>
+                <h2 className="font-headline text-xl font-bold text-white">{item.name}</h2>
+                <p className="text-slate-400">{item.initialTitle}</p>
               </div>
               <Link href={`/inventory/${item.id}/edit`} passHref>
-                <Button variant="outline" size="icon" aria-label="Editar item">
+                <Button variant="outline" size="icon" aria-label="Editar item" className="bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl">
                   <Pencil className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+        <div className="p-6 space-y-6">
             <div className="relative aspect-[4/3] w-full">
                 <Image
                     src={item.imageUrl ?? `https://picsum.photos/seed/${item.id}/400/300`}
                     alt={item.name}
                     fill
-                    className="object-cover rounded-md"
+                    className="object-cover rounded-2xl"
                     data-ai-hint={item.imageHint}
                 />
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-6 text-sm">
                 <div>
-                    <p className="font-medium">Status</p>
-                    <Badge variant={item.status === 'Sold' ? 'outline' : 'secondary'}>
+                    <p className="font-medium text-slate-400">Status</p>
+                     <Badge 
+                        variant='outline' 
+                        className={`mt-1 ${
+                            item.status === 'Sold' 
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                            : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }`}
+                    >
+                        <Dot className='-ml-1 mr-0.5' />
                         {item.status === 'Sold' ? 'Vendido' : 'Em Estoque'}
                     </Badge>
                 </div>
                 <div>
-                    <p className="font-medium">Condição</p>
-                    <p className="text-muted-foreground">{item.condition}</p>
+                    <p className="font-medium text-slate-400">Condição</p>
+                    <p className="text-slate-200 font-medium">{item.condition}</p>
                 </div>
                 <div>
-                    <p className="font-medium">Preço de Compra</p>
-                    <p className="text-muted-foreground">{formatCurrency(item.purchasePrice)}</p>
+                    <p className="font-medium text-slate-400">Preço de Compra</p>
+                    <p className="text-slate-200 font-medium">{formatCurrency(item.purchasePrice)}</p>
                 </div>
                 <div>
-                    <p className="font-medium">Preço de Venda</p>
-                    <p className="text-muted-foreground">{formatCurrency(item.salePrice)}</p>
+                    <p className="font-medium text-slate-400">Preço de Venda</p>
+                    <p className="text-slate-200 font-medium">{formatCurrency(item.salePrice)}</p>
                 </div>
                  <div>
-                    <p className="font-medium">Lucro</p>
-                    <p className={`font-semibold ${profit !== null ? (profit > 0 ? 'text-green-600' : 'text-red-600') : 'text-muted-foreground'}`}>
+                    <p className="font-medium text-slate-400">Lucro</p>
+                    <p className={`font-semibold ${profit !== null ? (profit > 0 ? 'text-emerald-400' : 'text-red-400') : 'text-slate-200'}`}>
                         {formatCurrency(profit)}
                     </p>
                 </div>
                  <div>
-                    <p className="font-medium">Data de Adição</p>
-                    <p className="text-muted-foreground">{formatDate(item.purchaseDate)}</p>
+                    <p className="font-medium text-slate-400">Data de Adição</p>
+                    <p className="text-slate-200 font-medium">{formatDate(item.purchaseDate)}</p>
                 </div>
             </div>
-        </CardContent>
+        </div>
         {item.status === 'In Stock' && (
             <form onSubmit={handleConfirmSale}>
-                <CardFooter className="flex flex-col items-start gap-4 bg-secondary/50 p-4">
-                    <h3 className="font-semibold">Marcar como Vendido</h3>
+                <div className="flex flex-col items-start gap-4 bg-slate-900 p-6 border-t border-slate-800">
+                    <h3 className="font-semibold text-white">Marcar como Vendido</h3>
                     <div className="grid w-full gap-2">
-                        <Label htmlFor="salePrice">Preço de Venda (R$)</Label>
+                        <Label htmlFor="salePrice" className="text-slate-400">Preço de Venda (R$)</Label>
                         <Input 
                             id="salePrice" 
                             name="salePrice" 
@@ -149,12 +157,15 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
                             value={salePrice}
                             onChange={(e) => setSalePrice(e.target.value)}
                             required
+                            className="bg-slate-800 border-slate-700 rounded-xl h-11"
                         />
                     </div>
-                    <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Confirmando...' : 'Confirmar Venda'}</Button>
-                </CardFooter>
+                    <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-500 rounded-xl h-11 px-6">
+                        {isSubmitting ? 'Confirmando...' : 'Confirmar Venda'}
+                    </Button>
+                </div>
             </form>
         )}
-    </Card>
+    </div>
   );
 }
