@@ -59,9 +59,8 @@ export function AppHeader() {
   return (
     <header 
       className="sticky top-0 z-30 flex h-20 shrink-0 items-center gap-4 bg-slate-950/80 px-4 backdrop-blur-lg md:px-6"
-      onClick={(e) => e.stopPropagation()}
     >
-      <div className="lg:hidden">
+      <div>
         <SidebarTrigger />
       </div>
       <div className="w-full flex-1">
