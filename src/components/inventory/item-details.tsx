@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { Item, WithId } from "@/lib/types";
-import { useUser, useFirestore, updateDocumentNonBlocking } from '@/firebase';
+import { useUser, useFirestore, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
 import { doc, serverTimestamp, increment } from 'firebase/firestore';
 import {
   Card,
@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { Pencil, Dot } from 'lucide-react';
+import { format } from 'date-fns';
 
 const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return '-';
@@ -34,6 +35,17 @@ const formatDate = (dateString: any) => {
     }
     return new Date(dateString).toLocaleDateString('pt-BR');
 }
+
+const getConditionStockField = (condition: Item['condition']): string | null => {
+    switch (condition) {
+        case 'New': return 'itemsInStockNew';
+        case 'Used - Like New': return 'itemsInStockUsedLikeNew';
+        case 'Used - Good': return 'itemsInStockUsedGood';
+        case 'Used - Fair': return 'itemsInStockUsedFair';
+        case 'For Parts': return 'itemsInStockForParts';
+        default: return null;
+    }
+};
 
 export function ItemDetails({ item }: { item: WithId<Item> }) {
   const { user } = useUser();
@@ -64,17 +76,37 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
           saleDate: serverTimestamp(),
           profit: profit,
       };
-
-      const updatedUserData = {
+      
+      const conditionField = getConditionStockField(item.condition);
+      const updatedUserData: { [key: string]: any } = {
         itemsInStock: increment(-1),
         totalItemsSold: increment(1),
         totalProfit: increment(profit),
         totalInvestmentSold: increment(item.purchasePrice),
       };
+      if (conditionField) {
+        updatedUserData[conditionField] = increment(-1);
+      }
+      
+      // Update monthly summary
+      const saleDate = new Date();
+      const saleMonthId = format(saleDate, 'yyyy-MM');
+      const summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', saleMonthId);
+      const summaryData = {
+          id: saleMonthId,
+          year: saleDate.getFullYear(),
+          month: saleDate.getMonth() + 1,
+          totalProfit: increment(profit),
+          totalItemsSold: increment(1),
+      };
+
 
       try {
+        // Update documents
         updateDocumentNonBlocking(itemRef, updatedItemData);
         updateDocumentNonBlocking(userRef, updatedUserData);
+        setDocumentNonBlocking(summaryRef, summaryData, { merge: true });
+
         toast({
             title: 'Venda Confirmada!',
             description: `O item ${item.name} foi marcado como vendido.`,

@@ -23,6 +23,17 @@ interface ItemFormProps {
   item?: WithId<Item>;
 }
 
+const getConditionStockField = (condition: string): string | null => {
+    switch (condition) {
+        case 'New': return 'itemsInStockNew';
+        case 'Used - Like New': return 'itemsInStockUsedLikeNew';
+        case 'Used - Good': return 'itemsInStockUsedGood';
+        case 'Used - Fair': return 'itemsInStockUsedFair';
+        case 'For Parts': return 'itemsInStockForParts';
+        default: return null;
+    }
+};
+
 export function ItemForm({ item }: ItemFormProps) {
   const router = useRouter();
   const { user, isUserLoading: isAuthLoading } = useUser();
@@ -69,6 +80,8 @@ export function ItemForm({ item }: ItemFormProps) {
         if (item) {
             // Update existing item
             const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
+            // Note: If condition changes, we should adjust counters. This is a more complex scenario.
+            // For now, we assume condition is not editable or handle it separately.
             updateDocumentNonBlocking(itemRef, commonData);
             toast({ title: 'Item atualizado com sucesso!'});
             router.push(`/inventory/${item.id}`);
@@ -95,8 +108,14 @@ export function ItemForm({ item }: ItemFormProps) {
                 imageHint: 'new item'
             };
             
+            const conditionField = getConditionStockField(formData.condition);
+            const userUpdateData: { [key: string]: any } = { itemsInStock: increment(1) };
+            if (conditionField) {
+                userUpdateData[conditionField] = increment(1);
+            }
+            
             setDocumentNonBlocking(newDocRef, newItemData, {});
-            updateDocumentNonBlocking(userRef, { itemsInStock: increment(1) });
+            updateDocumentNonBlocking(userRef, userUpdateData);
             
             toast({ title: 'Item adicionado com sucesso!'});
             router.push('/dashboard');

@@ -34,7 +34,20 @@ export type UserProfile = {
   totalItemsSold?: number;
   itemsInStock?: number;
   totalInvestmentSold?: number;
+  itemsInStockNew?: number;
+  itemsInStockUsedLikeNew?: number;
+  itemsInStockUsedGood?: number;
+  itemsInStockUsedFair?: number;
+  itemsInStockForParts?: number;
 };
+
+export type MonthlySummary = {
+  id: string; // YYYY-MM
+  year: number;
+  month: number;
+  totalProfit: number;
+  totalItemsSold: number;
+}
 
 // Represents the mock user data structure, not used with live data.
 export type User = {

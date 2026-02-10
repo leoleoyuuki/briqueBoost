@@ -3,9 +3,8 @@
 import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, doc, query, orderBy, limit } from 'firebase/firestore';
-import type { Item, UserProfile } from '@/lib/types';
-import { StatCards } from '@/components/dashboard/stat-cards';
+import { collection, doc, query, orderBy, limit, where } from 'firebase/firestore';
+import type { Item, UserProfile, MonthlySummary } from '@/lib/types';
 import { InventoryTable } from '@/components/dashboard/inventory-table';
 import { ProfitChart } from '@/components/dashboard/profit-chart';
 import { ItemSummary } from '@/components/dashboard/item-summary';
@@ -24,6 +23,7 @@ import {
     Download,
     Plus
 } from 'lucide-react';
+import { subMonths, format } from 'date-fns';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -43,12 +43,17 @@ export default function DashboardPage() {
 
     const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
 
-    // Query for all items for charts
-    const allItemsQuery = useMemoFirebase(() => {
+    // Query for last 6 months of summaries for the profit chart
+    const summariesQuery = useMemoFirebase(() => {
         if (!user) return null;
-        return collection(firestore, 'users', user.uid, 'items');
+        return query(
+            collection(firestore, 'users', user.uid, 'monthlySummaries'), 
+            orderBy('id', 'desc'), 
+            limit(6)
+        );
     }, [firestore, user]);
-    const { data: allItems, isLoading: areAllItemsLoading } = useCollection<Item>(allItemsQuery);
+    const { data: monthlySummaries, isLoading: areSummariesLoading } = useCollection<MonthlySummary>(summariesQuery);
+
 
     // Query for recent items for the table
     const recentItemsQuery = useMemoFirebase(() => {
@@ -205,7 +210,7 @@ export default function DashboardPage() {
                             
                             <div className="mb-4">
                                 <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Total de Pedidos
+                                    Total de Itens Vendidos
                                 </p>
                                 <p className="text-4xl font-bold mb-1">
                                     {stats.totalItemsSold}
@@ -306,7 +311,7 @@ export default function DashboardPage() {
                         </div>
                         
                         <div className="p-6">
-                            <ProfitChart items={allItems} isLoading={areAllItemsLoading} />
+                            <ProfitChart summaries={monthlySummaries} isLoading={areSummariesLoading} />
                         </div>
                     </div>
                     
@@ -326,7 +331,7 @@ export default function DashboardPage() {
                         </div>
                         
                         <div className="p-6">
-                            <ItemSummary items={allItems} isLoading={areAllItemsLoading} />
+                           <ItemSummary userProfile={userProfile} isLoading={isProfileLoading} />
                         </div>
                     </div>
                 </div>
@@ -354,7 +359,7 @@ export default function DashboardPage() {
                                 <p className="text-5xl font-bold mb-2">{stats.itemsInStock}</p>
                                 <p className="text-slate-400 text-sm mb-3">produtos</p>
                                 <p className="text-xs text-slate-500">
-                                    <span className="text-red-400 font-semibold">12 pedidos</span> aguardando confirmação
+                                    <span className="text-red-400 font-semibold">12 itens</span> aguardando confirmação
                                 </p>
                             </div>
                         </div>

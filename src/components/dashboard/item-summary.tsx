@@ -1,41 +1,45 @@
 'use client'
 
-import type { Item } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { UserProfile } from "@/lib/types";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useMemo } from "react";
 import { Skeleton } from "../ui/skeleton";
 
-
-const itemConditions = ["New", "Used - Like New", "Used - Good", "Used - Fair", "For Parts"];
 const conditionTranslations: { [key: string]: string } = {
-    "New": "Novo",
-    "Used - Like New": "Usado - Como Novo",
-    "Used - Good": "Usado - Bom",
-    "Used - Fair": "Usado - Razoável",
-    "For Parts": "Para Peças"
+    "itemsInStockNew": "Novo",
+    "itemsInStockUsedLikeNew": "Usado - Como Novo",
+    "itemsInStockUsedGood": "Usado - Bom",
+    "itemsInStockUsedFair": "Usado - Razoável",
+    "itemsInStockForParts": "Para Peças"
 };
 
-export function ItemSummary({ items, isLoading }: { items: Item[] | null, isLoading: boolean }) {
+const conditionOrder = [
+    "itemsInStockNew",
+    "itemsInStockUsedLikeNew",
+    "itemsInStockUsedGood",
+    "itemsInStockUsedFair",
+    "itemsInStockForParts"
+];
+
+export function ItemSummary({ userProfile, isLoading }: { userProfile: UserProfile | null, isLoading: boolean }) {
 
     const summaryData = useMemo(() => {
-        if (!items) return null;
+        if (!userProfile) return null;
 
-        const totalItems = items.length;
+        const totalItems = userProfile.itemsInStock ?? 0;
         if (totalItems === 0) return [];
         
-        const conditionCounts = items.reduce((acc, item) => {
-            acc[item.condition] = (acc[item.condition] || 0) + 1;
-            return acc;
-        }, {} as Record<string, number>);
+        return conditionOrder.map(key => {
+            const value = (userProfile as any)[key] ?? 0;
+            return {
+                name: conditionTranslations[key],
+                value: value,
+                percentage: totalItems > 0 ? (value / totalItems) * 100 : 0,
+            }
+        }).filter(d => d.value > 0);
 
-        return itemConditions.map(condition => ({
-            name: conditionTranslations[condition],
-            value: conditionCounts[condition] || 0,
-            percentage: totalItems > 0 ? ((conditionCounts[condition] || 0) / totalItems) * 100 : 0,
-        })).filter(d => d.value > 0);
-
-    }, [items]);
+    }, [userProfile]);
 
     if (isLoading) {
         return (
@@ -73,7 +77,7 @@ export function ItemSummary({ items, isLoading }: { items: Item[] | null, isLoad
                     </div>
                 ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground">
-                        <p>Nenhum item para exibir.</p>
+                        <p>Nenhum item em estoque.</p>
                     </div>
                 )}
             </CardContent>

@@ -48,6 +48,26 @@
         "totalInvestmentSold": {
             "type": "number",
             "description": "The total purchase price of all sold items."
+        },
+        "itemsInStockNew": {
+          "type": "number",
+          "description": "Count of items in stock with 'New' condition."
+        },
+        "itemsInStockUsedLikeNew": {
+          "type": "number",
+          "description": "Count of items in stock with 'Used - Like New' condition."
+        },
+        "itemsInStockUsedGood": {
+          "type": "number",
+          "description": "Count of items in stock with 'Used - Good' condition."
+        },
+        "itemsInStockUsedFair": {
+          "type": "number",
+          "description": "Count of items in stock with 'Used - Fair' condition."
+        },
+        "itemsInStockForParts": {
+          "type": "number",
+          "description": "Count of items in stock with 'For Parts' condition."
         }
       },
       "required": [
@@ -156,6 +176,41 @@
         "initialDescription",
         "status"
       ]
+    },
+    "MonthlySummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Monthly Summary",
+      "type": "object",
+      "description": "Represents a monthly summary of sales activity for a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the summary in 'YYYY-MM' format."
+        },
+        "year": {
+          "type": "number",
+          "description": "The year of the summary."
+        },
+        "month": {
+          "type": "number",
+          "description": "The month of the summary (1-12)."
+        },
+        "totalProfit": {
+          "type": "number",
+          "description": "Total profit for the month."
+        },
+        "totalItemsSold": {
+          "type": "number",
+          "description": "Total items sold during the month."
+        }
+      },
+      "required": [
+        "id",
+        "year",
+        "month",
+        "totalProfit",
+        "totalItemsSold"
+      ]
     }
   },
   "auth": {
@@ -198,6 +253,26 @@
             {
               "name": "itemId",
               "description": "The unique identifier for the item."
+            }
+          ]
+        }
+      },
+       {
+        "path": "/users/{userId}/monthlySummaries/{summaryId}",
+        "definition": {
+          "entityName": "MonthlySummary",
+          "schema": {
+            "$ref": "#/backend/entities/MonthlySummary"
+          },
+          "description": "Stores aggregated monthly sales data for each user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "summaryId",
+              "description": "The identifier for the monthly summary (format: YYYY-MM)."
             }
           ]
         }

@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import type { Item } from '@/lib/types';
+import type { MonthlySummary } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AreaChart, Area, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { format, subMonths } from 'date-fns';
+import { format, subMonths, getMonth, getYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -24,38 +24,27 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export function ProfitChart({ items, isLoading }: { items: Item[] | null; isLoading: boolean }) {
+export function ProfitChart({ summaries, isLoading }: { summaries: MonthlySummary[] | null; isLoading: boolean }) {
     const chartData = useMemo(() => {
-        const months = Array.from({ length: 6 }, (_, i) => subMonths(new Date(), i));
-        const monthlyProfits: { [key: string]: number } = {};
-
-        // Initialize last 6 months with 0 profit
-        for (const month of months) {
-            const monthKey = format(month, 'MMM', { locale: ptBR });
-            monthlyProfits[monthKey] = 0;
-        }
-
-        if (items) {
-            const soldItems = items.filter(item => item.status === 'Sold' && item.saleDate && typeof item.profit === 'number');
-            
-            for (const item of soldItems) {
-                const saleDate = item.saleDate.toDate(); // Assuming Firestore Timestamp
-                const sixMonthsAgo = subMonths(new Date(), 6);
-                
-                if (saleDate >= sixMonthsAgo) {
-                    const monthKey = format(saleDate, 'MMM', { locale: ptBR });
-                    if (monthlyProfits.hasOwnProperty(monthKey)) {
-                         monthlyProfits[monthKey] += item.profit!;
-                    }
-                }
+        const dataMap = new Map<string, number>();
+        if (summaries) {
+            for (const summary of summaries) {
+                 const monthName = format(new Date(summary.year, summary.month - 1), 'MMM', { locale: ptBR });
+                 dataMap.set(monthName, summary.totalProfit);
             }
         }
 
-        return Object.entries(monthlyProfits)
-            .map(([name, profit]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), profit }))
-            .reverse();
+        const last6Months = Array.from({ length: 6 }, (_, i) => subMonths(new Date(), i));
+        
+        return last6Months.map(date => {
+            const monthName = format(date, 'MMM', { locale: ptBR });
+            return {
+                name: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+                profit: dataMap.get(monthName) ?? 0,
+            };
+        }).reverse();
 
-    }, [items]);
+    }, [summaries]);
 
     if (isLoading) {
         return (
