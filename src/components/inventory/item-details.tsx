@@ -83,6 +83,7 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
         totalItemsSold: increment(1),
         totalProfit: increment(profit),
         totalInvestmentSold: increment(item.purchasePrice),
+        totalRevenue: increment(price),
       };
       if (conditionField) {
         updatedUserData[conditionField] = increment(-1);

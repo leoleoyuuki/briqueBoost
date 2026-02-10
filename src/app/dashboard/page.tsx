@@ -21,7 +21,9 @@ import {
     Calendar,
     Filter,
     Download,
-    Plus
+    Plus,
+    CircleDollarSign,
+    PiggyBank
 } from 'lucide-react';
 import { subMonths, format } from 'date-fns';
 
@@ -75,12 +77,14 @@ export default function DashboardPage() {
     
     const stats = useMemo(() => {
         if (!userProfile) {
-            return { totalProfit: 0, itemsInStock: 0, averageProfitMargin: 0, totalItemsSold: 0 };
+            return { totalProfit: 0, itemsInStock: 0, averageProfitMargin: 0, totalItemsSold: 0, totalRevenue: 0, totalInvestment: 0 };
         }
         const totalProfit = userProfile.totalProfit ?? 0;
         const totalItemsSold = userProfile.totalItemsSold ?? 0;
         const itemsInStock = userProfile.itemsInStock ?? 0;
         const totalInvestmentSold = userProfile.totalInvestmentSold ?? 0;
+        const totalRevenue = userProfile.totalRevenue ?? 0;
+        const totalInvestment = userProfile.totalInvestment ?? 0;
         
         const averageProfitMargin = totalInvestmentSold > 0
             ? totalProfit / totalInvestmentSold
@@ -91,6 +95,8 @@ export default function DashboardPage() {
             itemsInStock,
             averageProfitMargin,
             totalItemsSold,
+            totalRevenue,
+            totalInvestment,
         }
     }, [userProfile]);
 
@@ -101,8 +107,8 @@ export default function DashboardPage() {
             <div className="min-h-screen bg-slate-950 p-6 md:p-8">
                 <div className="max-w-[1800px] mx-auto space-y-6">
                     <Skeleton className="h-24 bg-slate-900 rounded-3xl" />
-                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-                        {[1, 2, 3, 4].map((i) => (
+                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
                             <Skeleton key={i} className="h-48 bg-slate-900 rounded-3xl" />
                         ))}
                     </div>
@@ -153,7 +159,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
@@ -163,7 +169,7 @@ export default function DashboardPage() {
                         <div className="relative">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="p-3 bg-blue-500/10 rounded-2xl">
-                                    <DollarSign className="w-6 h-6 text-blue-400" strokeWidth={2.5} />
+                                    <CircleDollarSign className="w-6 h-6 text-blue-400" strokeWidth={2.5} />
                                 </div>
                                 <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
                                     <MoreVertical className="w-5 h-5 text-slate-400" />
@@ -172,7 +178,45 @@ export default function DashboardPage() {
                             
                             <div className="mb-4">
                                 <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Receita Total
+                                    Faturamento Bruto
+                                </p>
+                                <p className="text-4xl font-bold mb-1">
+                                    {new Intl.NumberFormat('pt-BR', { 
+                                        style: 'currency', 
+                                        currency: 'BRL',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(stats.totalRevenue)}
+                                </p>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 
+                                          border border-emerald-500/20 rounded-xl w-fit">
+                                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-400 text-sm font-bold">+2.5%</span>
+                                <span className="text-slate-500 text-xs">vs mês passado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
+                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                        
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl" />
+                        
+                        <div className="relative">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="p-3 bg-emerald-500/10 rounded-2xl">
+                                    <DollarSign className="w-6 h-6 text-emerald-400" strokeWidth={2.5} />
+                                </div>
+                                <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
+                                    <MoreVertical className="w-5 h-5 text-slate-400" />
+                                </button>
+                            </div>
+                            
+                            <div className="mb-4">
+                                <p className="text-slate-400 text-sm font-medium mb-2">
+                                    Lucro Líquido
                                 </p>
                                 <p className="text-4xl font-bold mb-1">
                                     {new Intl.NumberFormat('pt-BR', { 
@@ -188,6 +232,44 @@ export default function DashboardPage() {
                                           border border-emerald-500/20 rounded-xl w-fit">
                                 <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
                                 <span className="text-emerald-400 text-sm font-bold">+2.5%</span>
+                                <span className="text-slate-500 text-xs">vs mês passado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
+                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                        
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl" />
+                        
+                        <div className="relative">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="p-3 bg-purple-500/10 rounded-2xl">
+                                    <PiggyBank className="w-6 h-6 text-purple-400" strokeWidth={2.5} />
+                                </div>
+                                <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
+                                    <MoreVertical className="w-5 h-5 text-slate-400" />
+                                </button>
+                            </div>
+                            
+                            <div className="mb-4">
+                                <p className="text-slate-400 text-sm font-medium mb-2">
+                                    Investimento Total
+                                </p>
+                                <p className="text-4xl font-bold mb-1">
+                                    {new Intl.NumberFormat('pt-BR', { 
+                                        style: 'currency', 
+                                        currency: 'BRL',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(stats.totalInvestment)}
+                                </p>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 
+                                          border border-emerald-500/20 rounded-xl w-fit">
+                                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-400 text-sm font-bold">+1.8%</span>
                                 <span className="text-slate-500 text-xs">vs mês passado</span>
                             </div>
                         </div>
@@ -262,12 +344,12 @@ export default function DashboardPage() {
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl" />
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl" />
                         
                         <div className="relative">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-emerald-500/10 rounded-2xl">
-                                    <TrendingUp className="w-6 h-6 text-emerald-400" strokeWidth={2.5} />
+                                <div className="p-3 bg-teal-500/10 rounded-2xl">
+                                    <TrendingUp className="w-6 h-6 text-teal-400" strokeWidth={2.5} />
                                 </div>
                                 <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
                                     <MoreVertical className="w-5 h-5 text-slate-400" />

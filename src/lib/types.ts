@@ -31,6 +31,8 @@ export type UserProfile = {
   aiUsageCount: number;
   aiUsageLastReset: any; // Can be Timestamp
   totalProfit?: number;
+  totalRevenue?: number;
+  totalInvestment?: number;
   totalItemsSold?: number;
   itemsInStock?: number;
   totalInvestmentSold?: number;

@@ -37,6 +37,14 @@
             "type": "number",
             "description": "The total profit from all sold items."
         },
+        "totalRevenue": {
+            "type": "number",
+            "description": "The total gross revenue from all sold items."
+        },
+        "totalInvestment": {
+            "type": "number",
+            "description": "The total purchase price of all acquired items."
+        },
         "totalItemsSold": {
             "type": "number",
             "description": "The total number of items sold."

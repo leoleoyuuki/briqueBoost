@@ -109,7 +109,10 @@ export function ItemForm({ item }: ItemFormProps) {
             };
             
             const conditionField = getConditionStockField(formData.condition);
-            const userUpdateData: { [key: string]: any } = { itemsInStock: increment(1) };
+            const userUpdateData: { [key: string]: any } = { 
+                itemsInStock: increment(1),
+                totalInvestment: increment(parseFloat(String(formData.purchasePrice))),
+            };
             if (conditionField) {
                 userUpdateData[conditionField] = increment(1);
             }
