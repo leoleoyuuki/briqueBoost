@@ -47,6 +47,14 @@ const getConditionStockField = (condition: Item['condition']): string | null => 
     }
 };
 
+const conditionTranslations: { [key: string]: string } = {
+    "New": "Novo",
+    "Used - Like New": "Usado - Como Novo",
+    "Used - Good": "Usado - Bom",
+    "Used - Fair": "Usado - Razoável",
+    "For Parts": "Para Peças"
+};
+
 export function ItemDetails({ item }: { item: WithId<Item> }) {
   const { user } = useUser();
   const firestore = useFirestore();
@@ -169,7 +177,7 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
                 </div>
                 <div>
                     <p className="font-medium text-slate-400">Condição</p>
-                    <p className="text-slate-200 font-medium">{item.condition}</p>
+                    <p className="text-slate-200 font-medium">{conditionTranslations[item.condition as keyof typeof conditionTranslations] || item.condition}</p>
                 </div>
                 <div>
                     <p className="font-medium text-slate-400">Preço de Compra</p>

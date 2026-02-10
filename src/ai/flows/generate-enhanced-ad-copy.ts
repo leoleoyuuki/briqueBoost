@@ -14,16 +14,16 @@ import {z} from 'genkit';
  */
 
 const GenerateEnhancedAdCopyInputSchema = z.object({
-  initialTitle: z.string().describe('The current title of the product listing.'),
-  initialDescription: z.string().describe('The current description of the product listing.'),
-  itemDetails: z.string().describe('Additional details about the item for sale, such as condition, brand, and specific features.'),
+  initialTitle: z.string().describe('O título atual do anúncio do produto.'),
+  initialDescription: z.string().describe('A descrição atual do anúncio do produto.'),
+  itemDetails: z.string().describe('Detalhes adicionais sobre o item à venda, como condição, marca e características específicas.'),
 });
 export type GenerateEnhancedAdCopyInput = z.infer<typeof GenerateEnhancedAdCopyInputSchema>;
 
 const GenerateEnhancedAdCopyOutputSchema = z.object({
-  enhancedTitle: z.string().describe('An improved title for the product listing.'),
-  enhancedDescription: z.string().describe('An improved description for the product listing.'),
-  reasoning: z.string().describe('Explanation of why the title and description were enhanced.'),
+  enhancedTitle: z.string().describe('Um título aprimorado para o anúncio do produto.'),
+  enhancedDescription: z.string().describe('Uma descrição aprimorada para o anúncio do produto.'),
+  reasoning: z.string().describe('Explicação do motivo pelo qual o título e a descrição foram aprimorados.'),
 });
 export type GenerateEnhancedAdCopyOutput = z.infer<typeof GenerateEnhancedAdCopyOutputSchema>;
 
@@ -35,20 +35,20 @@ const prompt = ai.definePrompt({
   name: 'generateEnhancedAdCopyPrompt',
   input: {schema: GenerateEnhancedAdCopyInputSchema},
   output: {schema: GenerateEnhancedAdCopyOutputSchema},
-  prompt: `You are an expert marketing copywriter specializing in writing compelling product listings that attract buyers and increase sales.
+  prompt: `Você é um redator de marketing especialista em escrever anúncios de produtos atraentes que aumentam as vendas.
 
-  Given the following information about a product, generate an enhanced title and description that are more likely to attract buyers. Also, provide a brief explanation of your reasoning for the changes you made. The title should be concise and attention-grabbing, and the description should be detailed and persuasive.
+  Com base nas informações a seguir sobre um produto, gere um título e uma descrição aprimorados em português que sejam mais propensos a atrair compradores. Além disso, forneça uma breve explicação do seu raciocínio para as alterações feitas. O título deve ser conciso e chamativo, e a descrição deve ser detalhada e persuasiva.
 
-  Initial Title: {{{initialTitle}}}
-  Initial Description: {{{initialDescription}}}
-  Item Details: {{{itemDetails}}}
+  Título Inicial: {{{initialTitle}}}
+  Descrição Inicial: {{{initialDescription}}}
+  Detalhes do Item: {{{itemDetails}}}
 
-  Follow these instructions when creating the enhanced title and description:
+  Siga estas instruções ao criar o título e a descrição aprimorados:
 
-  - Use keywords that buyers are likely to search for.
-  - Highlight the key benefits and features of the product.
-  - Use persuasive language to create a sense of urgency and excitement.
-  - Ensure the enhanced title and description are accurate and truthful.
+  - Use palavras-chave que os compradores provavelmente pesquisarão.
+  - Destaque os principais benefícios e características do produto.
+  - Use uma linguagem persuasiva para criar um senso de urgência e entusiasmo.
+  - Garanta que o título e a descrição aprimorados sejam precisos e verdadeiros.
 `,
 });
 
