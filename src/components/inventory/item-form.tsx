@@ -241,9 +241,10 @@ export function ItemForm({ item }: ItemFormProps) {
                             </TabsList>
                             <TabsContent value="mobile" className="mt-4 text-slate-300 border border-slate-800 p-4 rounded-lg">
                                 <ol className="space-y-3 list-decimal list-inside">
-                                    <li>Abra a foto do anúncio no app do Facebook.</li>
-                                    <li>Toque no ícone de três pontos (⋮) no canto superior direito.</li>
-                                    <li>No menu, selecione a opção <strong>"Copiar link"</strong>.</li>
+                                    <li>Abra o Facebook no <strong>navegador do seu celular</strong> (Ex: Chrome, Safari), não no aplicativo.</li>
+                                    <li>Encontre o anúncio e toque na foto para vê-la em tela cheia.</li>
+                                    <li>Toque e <strong>segure o dedo sobre a imagem</strong>.</li>
+                                    <li>No menu que aparecer, selecione a opção <strong>"Copiar endereço da imagem"</strong> (o texto pode variar).</li>
                                     <li>Volte e cole o link aqui.</li>
                                 </ol>
                             </TabsContent>
