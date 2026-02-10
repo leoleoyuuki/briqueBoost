@@ -25,8 +25,8 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="hidden lg:flex lg:flex-col bg-slate-900 border-r border-slate-800">
-      <SidebarHeader className="p-4 h-20">
+    <Sidebar className="bg-slate-900 border-r border-slate-800">
+      <SidebarHeader>
         <Link href="/dashboard" className="flex items-center gap-3">
           <Logo className="w-8 h-8 text-blue-500" />
           <h2 className="text-xl font-bold text-white font-headline group-data-[state=collapsed]/sidebar-wrapper:hidden">
