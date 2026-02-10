@@ -266,8 +266,6 @@ export default function DashboardPage() {
                                     {new Intl.NumberFormat('pt-BR', { 
                                         style: 'currency', 
                                         currency: 'BRL',
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0
                                     }).format(stats.totalRevenue)}
                                 </p>
                             </div>
@@ -299,8 +297,6 @@ export default function DashboardPage() {
                                     {new Intl.NumberFormat('pt-BR', { 
                                         style: 'currency', 
                                         currency: 'BRL',
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0
                                     }).format(stats.totalProfit)}
                                 </p>
                             </div>
@@ -332,8 +328,6 @@ export default function DashboardPage() {
                                     {new Intl.NumberFormat('pt-BR', { 
                                         style: 'currency', 
                                         currency: 'BRL',
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0
                                     }).format(stats.totalInvestment)}
                                 </p>
                             </div>
@@ -574,8 +568,6 @@ export default function DashboardPage() {
                                     {new Intl.NumberFormat('pt-BR', { 
                                         style: 'currency', 
                                         currency: 'BRL',
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0
                                     }).format(stats.totalProfit)}
                                 </p>
                                 <p className="text-slate-400 text-sm mb-3">lucro líquido</p>

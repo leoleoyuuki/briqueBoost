@@ -68,7 +68,7 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
 
       const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
       const userRef = doc(firestore, 'users', user.uid);
-      const profit = price - item.purchasePrice;
+      const profit = parseFloat((price - item.purchasePrice).toFixed(2));
 
       const updatedItemData = {
           status: 'Sold' as const,

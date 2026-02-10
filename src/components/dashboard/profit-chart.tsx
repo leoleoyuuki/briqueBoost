@@ -8,16 +8,14 @@ import { format, subMonths, getMonth, getYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(value);
-};
-
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
             <div className="rounded-lg border border-border bg-background/90 p-2 shadow-sm">
                  <p className="text-sm font-semibold capitalize text-foreground">{label}</p>
-                 <p className="text-sm text-primary">{formatCurrency(payload[0].value)}</p>
+                 <p className="text-sm text-primary">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(payload[0].value)}
+                 </p>
             </div>
         );
     }
@@ -89,7 +87,12 @@ export function ProfitChart({ summaries, isLoading }: { summaries: MonthlySummar
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `R$${(value as number) / 1000}k`}
+                                tickFormatter={(value) => 
+                                    new Intl.NumberFormat('pt-BR', { 
+                                        notation: 'compact', 
+                                        compactDisplay: 'short' 
+                                    }).format(value as number)
+                                }
                             />
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }} />
                             <Area 
