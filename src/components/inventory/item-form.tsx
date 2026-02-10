@@ -27,13 +27,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { HelpCircle, Smartphone, Monitor } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 
 interface ItemFormProps {
   item?: WithId<Item>;
@@ -227,35 +221,16 @@ export function ItemForm({ item }: ItemFormProps) {
                         <DialogHeader>
                             <DialogTitle>Como Copiar o Link da Imagem</DialogTitle>
                             <DialogDescription className="text-slate-400">
-                                Siga o passo a passo para o Facebook Marketplace no seu dispositivo.
+                                Siga o passo a passo para copiar o link da imagem no seu computador.
                             </DialogDescription>
                         </DialogHeader>
-                         <Tabs defaultValue="mobile" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2 bg-slate-800">
-                                <TabsTrigger value="mobile" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white">
-                                    <Smartphone className="mr-2 h-4 w-4" />Celular
-                                </TabsTrigger>
-                                <TabsTrigger value="desktop" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white">
-                                    <Monitor className="mr-2 h-4 w-4" />Computador
-                                </TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="mobile" className="mt-4 text-slate-300 border border-slate-800 p-4 rounded-lg">
-                                <ol className="space-y-3 list-decimal list-inside">
-                                    <li>Abra o Facebook no <strong>navegador do seu celular</strong> (Ex: Chrome, Safari), não no aplicativo.</li>
-                                    <li>Encontre o anúncio e toque na foto para vê-la em tela cheia.</li>
-                                    <li>Toque e <strong>segure o dedo sobre a imagem</strong>.</li>
-                                    <li>No menu que aparecer, selecione a opção <strong>"Copiar endereço da imagem"</strong> (o texto pode variar).</li>
-                                    <li>Volte e cole o link aqui.</li>
-                                </ol>
-                            </TabsContent>
-                            <TabsContent value="desktop" className="mt-4 text-slate-300 border border-slate-800 p-4 rounded-lg">
-                                <ol className="space-y-3 list-decimal list-inside">
-                                    <li>Clique com o <strong>botão direito</strong> do mouse sobre a foto do anúncio.</li>
-                                    <li>No menu que aparecer, selecione <strong>"Copiar endereço da imagem"</strong>.</li>
-                                    <li>Volte e cole o link aqui.</li>
-                                </ol>
-                            </TabsContent>
-                        </Tabs>
+                        <div className="mt-4 text-slate-300 border border-slate-800 p-4 rounded-lg">
+                            <ol className="space-y-3 list-decimal list-inside">
+                                <li>Clique com o <strong>botão direito</strong> do mouse sobre a foto do anúncio.</li>
+                                <li>No menu que aparecer, selecione <strong>"Copiar endereço da imagem"</strong>.</li>
+                                <li>Volte e cole o link aqui.</li>
+                            </ol>
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>
