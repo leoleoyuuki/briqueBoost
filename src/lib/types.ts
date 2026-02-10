@@ -49,6 +49,9 @@ export type MonthlySummary = {
   month: number;
   totalProfit: number;
   totalItemsSold: number;
+  totalRevenue?: number;
+  totalInvestment?: number;
+  totalInvestmentSold?: number;
 }
 
 // Represents the mock user data structure, not used with live data.

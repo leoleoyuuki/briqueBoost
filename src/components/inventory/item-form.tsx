@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 
 interface ItemFormProps {
   item?: WithId<Item>;
@@ -90,6 +91,7 @@ export function ItemForm({ item }: ItemFormProps) {
             const itemsCollection = collection(firestore, 'users', user.uid, 'items');
             const newDocRef = doc(itemsCollection); // Create ref with new ID
             const userRef = doc(firestore, 'users', user.uid);
+            const purchasePrice = parseFloat(String(formData.purchasePrice));
 
             const newItemData = {
                 ...commonData,
@@ -111,14 +113,31 @@ export function ItemForm({ item }: ItemFormProps) {
             const conditionField = getConditionStockField(formData.condition);
             const userUpdateData: { [key: string]: any } = { 
                 itemsInStock: increment(1),
-                totalInvestment: increment(parseFloat(String(formData.purchasePrice))),
+                totalInvestment: increment(purchasePrice),
             };
             if (conditionField) {
                 userUpdateData[conditionField] = increment(1);
             }
+
+            // Add monthly summary update for investment
+            const purchaseDate = new Date();
+            const summaryId = format(purchaseDate, 'yyyy-MM');
+            const summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', summaryId);
+            const summaryData = {
+                id: summaryId,
+                year: purchaseDate.getFullYear(),
+                month: purchaseDate.getMonth() + 1,
+                totalInvestment: increment(purchasePrice),
+                // Initialize other fields to ensure they can be incremented later
+                totalProfit: increment(0),
+                totalItemsSold: increment(0),
+                totalRevenue: increment(0),
+                totalInvestmentSold: increment(0),
+            };
             
             setDocumentNonBlocking(newDocRef, newItemData, {});
             updateDocumentNonBlocking(userRef, userUpdateData);
+            setDocumentNonBlocking(summaryRef, summaryData, { merge: true });
             
             toast({ title: 'Item adicionado com sucesso!'});
             router.push('/dashboard');

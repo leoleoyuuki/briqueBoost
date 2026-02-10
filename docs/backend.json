@@ -210,6 +210,18 @@
         "totalItemsSold": {
           "type": "number",
           "description": "Total items sold during the month."
+        },
+        "totalRevenue": {
+            "type": "number",
+            "description": "Total gross revenue for the month."
+        },
+        "totalInvestment": {
+            "type": "number",
+            "description": "Total investment (purchase price) for items added this month."
+        },
+        "totalInvestmentSold": {
+            "type": "number",
+            "description": "Total purchase price of items sold this month."
         }
       },
       "required": [

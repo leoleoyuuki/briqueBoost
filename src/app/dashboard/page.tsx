@@ -27,6 +27,38 @@ import {
 } from 'lucide-react';
 import { subMonths, format } from 'date-fns';
 
+function ChangeIndicator({ change, isPositive }: { change: number, isPositive: boolean }) {
+    if (change === 0) {
+        return (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-fit">
+                <span className="text-slate-400 text-sm font-bold">~ 0%</span>
+                <span className="text-slate-500 text-xs">vs mês passado</span>
+            </div>
+        );
+    }
+
+    const sign = isPositive ? '+' : '';
+
+    if (isPositive) {
+        return (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl w-fit">
+                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400 text-sm font-bold">{sign}{change}%</span>
+                <span className="text-slate-500 text-xs">vs mês passado</span>
+            </div>
+        );
+    } else {
+        return (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-xl w-fit">
+                <ArrowDownRight className="w-3.5 h-3.5 text-red-400" />
+                <span className="text-red-400 text-sm font-bold">{sign}{change}%</span>
+                <span className="text-slate-500 text-xs">vs mês passado</span>
+            </div>
+        );
+    }
+}
+
+
 export default function DashboardPage() {
     const router = useRouter();
     const { user, isUserLoading } = useUser();
@@ -55,6 +87,56 @@ export default function DashboardPage() {
         );
     }, [firestore, user]);
     const { data: monthlySummaries, isLoading: areSummariesLoading } = useCollection<MonthlySummary>(summariesQuery);
+
+    const monthlyChanges = useMemo(() => {
+        const defaultChanges = {
+            revenue: { change: 0, isPositive: true },
+            profit: { change: 0, isPositive: true },
+            investment: { change: 0, isPositive: true },
+            itemsSold: { change: 0, isPositive: true },
+            avgMargin: { change: 0, isPositive: true },
+        };
+
+        if (!monthlySummaries || monthlySummaries.length < 1) {
+            return defaultChanges;
+        }
+
+        const now = new Date();
+        const currentMonthId = format(now, 'yyyy-MM');
+        const prevMonthId = format(subMonths(now, 1), 'yyyy-MM');
+
+        const currentMonthData = monthlySummaries.find(s => s.id === currentMonthId);
+        const prevMonthData = monthlySummaries.find(s => s.id === prevMonthId);
+
+        const calculateChange = (current?: number, previous?: number) => {
+            const c = current ?? 0;
+            const p = previous ?? 0;
+            if (p === 0) {
+                // If previous is 0, any increase is "infinite" but we can show 100%
+                // If current is also 0, change is 0.
+                return { change: c > 0 ? 100 : 0, isPositive: c >= 0 };
+            }
+            const change = ((c - p) / p) * 100;
+            return { change: parseFloat(change.toFixed(1)), isPositive: change >= 0 };
+        };
+        
+        const currentAvgMargin = (currentMonthData?.totalInvestmentSold ?? 0) > 0 
+            ? (currentMonthData?.totalProfit ?? 0) / currentMonthData!.totalInvestmentSold! 
+            : 0;
+        const prevAvgMargin = (prevMonthData?.totalInvestmentSold ?? 0) > 0 
+            ? (prevMonthData?.totalProfit ?? 0) / prevMonthData!.totalInvestmentSold! 
+            : 0;
+
+
+        return {
+            revenue: calculateChange(currentMonthData?.totalRevenue, prevMonthData?.totalRevenue),
+            profit: calculateChange(currentMonthData?.totalProfit, prevMonthData?.totalProfit),
+            investment: calculateChange(currentMonthData?.totalInvestment, prevMonthData?.totalInvestment),
+            itemsSold: calculateChange(currentMonthData?.totalItemsSold, prevMonthData?.totalItemsSold),
+            avgMargin: calculateChange(currentAvgMargin, prevAvgMargin),
+        };
+
+    }, [monthlySummaries]);
 
 
     // Query for recent items for the table
@@ -190,12 +272,7 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 
-                                          border border-emerald-500/20 rounded-xl w-fit">
-                                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400 text-sm font-bold">+2.5%</span>
-                                <span className="text-slate-500 text-xs">vs mês passado</span>
-                            </div>
+                            <ChangeIndicator change={monthlyChanges.revenue.change} isPositive={monthlyChanges.revenue.isPositive} />
                         </div>
                     </div>
 
@@ -228,12 +305,7 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 
-                                          border border-emerald-500/20 rounded-xl w-fit">
-                                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400 text-sm font-bold">+2.5%</span>
-                                <span className="text-slate-500 text-xs">vs mês passado</span>
-                            </div>
+                            <ChangeIndicator change={monthlyChanges.profit.change} isPositive={monthlyChanges.profit.isPositive} />
                         </div>
                     </div>
 
@@ -266,12 +338,7 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 
-                                          border border-emerald-500/20 rounded-xl w-fit">
-                                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400 text-sm font-bold">+1.8%</span>
-                                <span className="text-slate-500 text-xs">vs mês passado</span>
-                            </div>
+                            <ChangeIndicator change={monthlyChanges.investment.change} isPositive={monthlyChanges.investment.isPositive} />
                         </div>
                     </div>
 
@@ -299,12 +366,7 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 
-                                          border border-red-500/20 rounded-xl w-fit">
-                                <ArrowDownRight className="w-3.5 h-3.5 text-red-400" />
-                                <span className="text-red-400 text-sm font-bold">-0.8%</span>
-                                <span className="text-slate-500 text-xs">vs mês passado</span>
-                            </div>
+                            <ChangeIndicator change={monthlyChanges.itemsSold.change} isPositive={monthlyChanges.itemsSold.isPositive} />
                         </div>
                     </div>
 
@@ -330,13 +392,6 @@ export default function DashboardPage() {
                                 <p className="text-4xl font-bold mb-1">
                                     {stats.itemsInStock}
                                 </p>
-                            </div>
-                            
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 
-                                          border border-red-500/20 rounded-xl w-fit">
-                                <ArrowDownRight className="w-3.5 h-3.5 text-red-400" />
-                                <span className="text-red-400 text-sm font-bold">-1.2%</span>
-                                <span className="text-slate-500 text-xs">vs mês passado</span>
                             </div>
                         </div>
                     </div>
@@ -365,12 +420,7 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 
-                                          border border-emerald-500/20 rounded-xl w-fit">
-                                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400 text-sm font-bold">+5.6%</span>
-                                <span className="text-slate-500 text-xs">vs mês passado</span>
-                            </div>
+                             <ChangeIndicator change={monthlyChanges.avgMargin.change} isPositive={monthlyChanges.avgMargin.isPositive} />
                         </div>
                     </div>
                 </div>

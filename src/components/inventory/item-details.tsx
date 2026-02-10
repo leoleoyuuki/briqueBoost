@@ -99,6 +99,8 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
           month: saleDate.getMonth() + 1,
           totalProfit: increment(profit),
           totalItemsSold: increment(1),
+          totalRevenue: increment(price),
+          totalInvestmentSold: increment(item.purchasePrice),
       };
 
 
