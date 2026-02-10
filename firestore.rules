@@ -112,6 +112,20 @@ service cloud.firestore {
         allow create: if isOwner(userId) && hasValidItemData(userId, itemId);
         allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
       }
+
+      /**
+       * @description Manages monthly sales summaries for a user.
+       * @path /users/{userId}/monthlySummaries/{summaryId}
+       * @allow (get, list) User 'user_abc' can read their own monthly summaries for charts.
+       * @allow (create, update) The system can create or update a monthly summary when a sale occurs.
+       * @deny (get) User 'user_xyz' attempts to read another user's sales data.
+       * @principle Enforces strict data ownership for aggregated financial data.
+       */
+      match /monthlySummaries/{summaryId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId);
+        allow delete: if false;
+      }
     }
   }
 }
