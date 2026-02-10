@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { Item } from '@/lib/types';
@@ -453,16 +454,16 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* 📋 LISTA DE PEDIDOS */}
+                {/* 📋 LISTA DE ITENS */}
                 <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
                     
                     {/* Header da tabela */}
                     <div className="p-6 border-b border-slate-800">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
-                                <h2 className="text-2xl font-bold mb-1">Lista de Pedidos</h2>
+                                <h2 className="text-2xl font-bold mb-1">Lista de Itens</h2>
                                 <p className="text-slate-400 text-sm">
-                                    {sortedItems.length} {sortedItems.length === 1 ? 'pedido' : 'pedidos'}
+                                    {sortedItems.length} {sortedItems.length === 1 ? 'item' : 'itens'}
                                 </p>
                             </div>
                             
@@ -473,12 +474,14 @@ export default function DashboardPage() {
                                     <Download className="w-4 h-4" />
                                     Exportar
                                 </button>
-                                <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
-                                                 text-white rounded-xl transition-all duration-200 
-                                                 flex items-center gap-2 font-medium text-sm">
-                                    <Plus className="w-4 h-4" />
-                                    Adicionar pedido
-                                </button>
+                                <Link href="/inventory/new">
+                                    <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
+                                                    text-white rounded-xl transition-all duration-200 
+                                                    flex items-center gap-2 font-medium text-sm">
+                                        <Plus className="w-4 h-4" />
+                                        Adicionar Item
+                                    </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -488,8 +491,6 @@ export default function DashboardPage() {
                         <InventoryTable 
                             items={sortedItems} 
                             isLoading={areItemsLoading} 
-                            title="" 
-                            description=""
                         />
                     </div>
                 </div>
