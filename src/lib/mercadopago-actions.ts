@@ -1,6 +1,6 @@
 'use server';
 
-import { MercadoPagoConfig, Subscription } from 'mercadopago';
+import * as mercadopago from 'mercadopago';
 
 interface CreateSubscriptionInput {
     userEmail: string;
@@ -19,12 +19,12 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
     // Using localhost for now as a fallback.
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
     
-    const client = new MercadoPagoConfig({ 
+    const client = new mercadopago.MercadoPagoConfig({ 
         accessToken,
         options: { timeout: 5000 }
     });
     
-    const subscription = new Subscription(client);
+    const subscription = new mercadopago.Subscription(client);
 
     const createPayload = {
         reason: 'Assinatura BriqueBoost Pro',
