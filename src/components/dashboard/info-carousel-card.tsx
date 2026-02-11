@@ -40,7 +40,7 @@ export function InfoCarouselCard() {
     <div
       className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                    rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
-                   transition-all duration-300 flex flex-col min-h-[240px]"
+                   transition-all duration-300 flex flex-col min-h-[220px] md:min-h-[240px]"
     >
       <div
         className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl 
@@ -60,7 +60,7 @@ export function InfoCarouselCard() {
               return (
                 <CarouselItem key={index} className="pt-1">
                   <div className="flex flex-col justify-center h-full">
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="p-3 bg-slate-800 rounded-2xl">
                         <Icon className={`w-6 h-6 ${tip.color}`} />
                       </div>
@@ -68,7 +68,7 @@ export function InfoCarouselCard() {
                         <ArrowUpRight className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-lg font-bold mb-2 text-slate-100">{tip.title}</p>
+                    <p className="text-base md:text-lg font-bold mb-2 text-slate-100">{tip.title}</p>
                     <p className="text-sm text-slate-400">
                         {tip.description}
                     </p>

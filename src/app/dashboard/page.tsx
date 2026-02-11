@@ -189,10 +189,10 @@ export default function DashboardPage() {
 
     if (isLoading || !user) {
         return (
-            <div className="min-h-screen bg-slate-950 p-6 md:p-8">
+            <div className="min-h-screen bg-slate-950 p-4 md:p-8">
                 <div className="max-w-[1800px] mx-auto space-y-6">
                     <Skeleton className="h-24 bg-slate-900 rounded-3xl" />
-                    <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
                             <Skeleton key={i} className="h-48 bg-slate-900 rounded-3xl" />
                         ))}
@@ -214,7 +214,7 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-slate-950 text-white">
-            <div className="max-w-[1800px] mx-auto p-6 md:p-8 space-y-6">
+            <div className="max-w-[1800px] mx-auto p-4 md:p-8 space-y-6">
                 
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
                     <div>
@@ -244,12 +244,12 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+                <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                                  rounded-3xl p-4 md:p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between mb-4 md:mb-6">
                                 <div className="p-3 bg-blue-500/10 rounded-2xl">
                                     <CircleDollarSign className="w-6 h-6 text-blue-400" strokeWidth={2.5} />
                                 </div>
@@ -259,7 +259,7 @@ export default function DashboardPage() {
                             </div>
                             <div className="mb-4">
                                 <p className="text-slate-400 text-sm font-medium mb-2">Faturamento Bruto</p>
-                                <p className="text-4xl font-bold mb-1">
+                                <p className="text-3xl sm:text-4xl font-bold mb-1">
                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalRevenue)}
                                 </p>
                             </div>
@@ -268,10 +268,10 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                                  rounded-3xl p-4 md:p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between mb-4 md:mb-6">
                                 <div className="p-3 bg-emerald-500/10 rounded-2xl">
                                     <DollarSign className="w-6 h-6 text-emerald-400" strokeWidth={2.5} />
                                 </div>
@@ -281,7 +281,7 @@ export default function DashboardPage() {
                             </div>
                             <div className="mb-4">
                                 <p className="text-slate-400 text-sm font-medium mb-2">Lucro Líquido</p>
-                                <p className="text-4xl font-bold mb-1">
+                                <p className="text-3xl sm:text-4xl font-bold mb-1">
                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(stats.totalProfit)}
                                 </p>
                             </div>
@@ -290,18 +290,18 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 mt-6">
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mt-6">
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center justify-between mb-3">
                                 <div className="p-2.5 bg-purple-500/10 rounded-2xl">
                                     <PiggyBank className="w-5 h-5 text-purple-400" strokeWidth={2.5} />
                                 </div>
                             </div>
-                            <div className="mb-2">
-                                <p className="text-slate-400 text-sm font-medium mb-1">Investimento Total</p>
-                                <p className="text-3xl font-bold">
+                            <div className="mb-1">
+                                <p className="text-slate-400 text-xs sm:text-sm font-medium mb-1">Investimento Total</p>
+                                <p className="text-2xl sm:text-3xl font-bold">
                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalInvestment)}
                                 </p>
                             </div>
@@ -309,48 +309,48 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center justify-between mb-3">
                                 <div className="p-2.5 bg-orange-500/10 rounded-2xl">
                                     <ShoppingCart className="w-5 h-5 text-orange-400" strokeWidth={2.5} />
                                 </div>
                             </div>
-                            <div className="mb-2">
-                                <p className="text-slate-400 text-sm font-medium mb-1">Total de Itens Vendidos</p>
-                                <p className="text-3xl font-bold">{stats.totalItemsSold}</p>
+                            <div className="mb-1">
+                                <p className="text-slate-400 text-xs sm:text-sm font-medium mb-1">Total de Itens Vendidos</p>
+                                <p className="text-2xl sm:text-3xl font-bold">{stats.totalItemsSold}</p>
                             </div>
                             <ChangeIndicator change={monthlyChanges.itemsSold.change} isPositive={monthlyChanges.itemsSold.isPositive} />
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center justify-between mb-3">
                                 <div className="p-2.5 bg-pink-500/10 rounded-2xl">
                                     <Package className="w-5 h-5 text-pink-400" strokeWidth={2.5} />
                                 </div>
                             </div>
-                            <div className="mb-2">
-                                <p className="text-slate-400 text-sm font-medium mb-1">Em Estoque</p>
-                                <p className="text-3xl font-bold">{stats.itemsInStock}</p>
+                            <div className="mb-1">
+                                <p className="text-slate-400 text-xs sm:text-sm font-medium mb-1">Em Estoque</p>
+                                <p className="text-2xl sm:text-3xl font-bold">{stats.itemsInStock}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center justify-between mb-3">
                                 <div className="p-2.5 bg-teal-500/10 rounded-2xl">
                                     <TrendingUp className="w-5 h-5 text-teal-400" strokeWidth={2.5} />
                                 </div>
                             </div>
-                            <div className="mb-2">
-                                <p className="text-slate-400 text-sm font-medium mb-1">Margem Média</p>
-                                <p className="text-3xl font-bold">
+                            <div className="mb-1">
+                                <p className="text-slate-400 text-xs sm:text-sm font-medium mb-1">Margem Média</p>
+                                <p className="text-2xl sm:text-3xl font-bold">
                                     {(stats.averageProfitMargin * 100).toFixed(1)}%
                                 </p>
                             </div>
@@ -361,7 +361,7 @@ export default function DashboardPage() {
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <div className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
-                        <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="p-4 md:p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
                                 <h3 className="text-xl font-bold mb-1">Análise de Performance</h3>
                                 <p className="text-slate-400 text-sm">Visualize o lucro ou faturamento dos últimos 6 meses.</p>
@@ -373,7 +373,7 @@ export default function DashboardPage() {
                                 </TabsList>
                             </Tabs>
                         </div>
-                        <div className="p-6">
+                        <div className="p-2 sm:p-6">
                             <ProfitChart summaries={monthlySummaries} isLoading={areSummariesLoading} view={chartView} />
                         </div>
                     </div>
@@ -382,7 +382,7 @@ export default function DashboardPage() {
                         <InfoCarouselCard />
 
                         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
-                            <div className="p-6 border-b border-slate-800">
+                            <div className="p-4 md:p-6 border-b border-slate-800">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h3 className="text-xl font-bold mb-1">Itens por Condição</h3>
@@ -393,7 +393,7 @@ export default function DashboardPage() {
                                     </button>
                                 </div>
                             </div>
-                            <div className="p-6">
+                            <div className="p-4 md:p-6">
                                <ItemSummary userProfile={userProfile} isLoading={isProfileLoading} />
                             </div>
                         </div>
@@ -402,7 +402,7 @@ export default function DashboardPage() {
 
                 <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
                     
-                    <div className="p-6 border-b border-slate-800">
+                    <div className="p-4 md:p-6 border-b border-slate-800">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
                                 <h2 className="text-2xl font-bold mb-1">Itens Recentes</h2>
@@ -411,7 +411,7 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center flex-wrap justify-end gap-3">
                                 <button className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 
                                                  text-white rounded-xl transition-all duration-200 
                                                  flex items-center gap-2 font-medium text-sm">

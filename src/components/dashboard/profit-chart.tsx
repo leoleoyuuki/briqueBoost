@@ -65,11 +65,11 @@ export function ProfitChart({ summaries, isLoading, view = 'profit' }: ProfitCha
     const currentConfig = chartConfig[view];
 
     if (isLoading) {
-        return <Skeleton className="h-[350px] w-full" />;
+        return <Skeleton className="h-[300px] sm:h-[350px] w-full" />;
     }
 
     return (
-        <div className="h-[350px] w-full -ml-4">
+        <div className="h-[300px] sm:h-[350px] w-full -ml-2 sm:-ml-4">
             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                     <defs>
