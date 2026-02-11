@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { subMonths, format } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { InfoCarouselCard } from '@/components/dashboard/info-carousel-card';
 
 function ChangeIndicator({ change, isPositive }: { change: number, isPositive: boolean }) {
     if (change === 0) {
@@ -494,32 +495,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
-                                  transition-all duration-300">
-                        
-                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl 
-                                      group-hover:bg-purple-500/20 transition-all duration-300" />
-                        
-                        <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-slate-800 rounded-2xl">
-                                    <span className="text-3xl">👥</span>
-                                </div>
-                                <button className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors">
-                                    <ArrowUpRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                            
-                            <div>
-                                <p className="text-5xl font-bold mb-2">{Math.floor(stats.totalItemsSold * 0.7)}</p>
-                                <p className="text-slate-400 text-sm mb-3">clientes</p>
-                                <p className="text-xs text-slate-500">
-                                    <span className="text-orange-400 font-semibold">{Math.floor(stats.totalItemsSold * 0.7)} clientes</span> aguardando resposta
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <InfoCarouselCard />
 
                     <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
