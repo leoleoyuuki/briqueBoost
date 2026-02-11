@@ -1,5 +1,7 @@
 'use server';
 
+import { randomUUID } from 'crypto';
+
 interface CreateSubscriptionInput {
     userEmail: string;
 }
@@ -15,8 +17,6 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
     
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
     
-    // This payload creates the subscription details on the fly.
-    // It doesn't require a pre-configured plan ID.
     const createPayload = {
         reason: 'Assinatura BriqueBoost Pro',
         auto_recurring: {
@@ -25,9 +25,11 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
             transaction_amount: 29.90,
             currency_id: 'BRL'
         },
-        back_url: `${baseUrl}/subscription`, // User is redirected here after payment
+        back_url: `${baseUrl}/subscription`,
         payer_email: userEmail,
     };
+
+    const idempotencyKey = randomUUID();
 
     try {
         const response = await fetch('https://api.mercadopago.com/preapproval', {
@@ -35,6 +37,7 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
+                'X-Idempotency-Key': idempotencyKey,
             },
             body: JSON.stringify(createPayload),
         });
@@ -45,9 +48,10 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
             console.error('Mercado Pago API error:', {
                 status: response.status,
                 statusText: response.statusText,
+                idempotencyKey: idempotencyKey,
                 body: responseData
             });
-            const errorMessage = responseData.message || 'Não foi possível iniciar o processo de assinatura. Por favor, verifique as configurações.';
+            const errorMessage = responseData.message || 'Não foi possível iniciar o processo de assinatura. Verifique as credenciais e tente novamente.';
             throw new Error(errorMessage);
         }
 
@@ -60,6 +64,6 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
 
     } catch (error: any) {
         console.error('Falha na comunicação com a API do Mercado Pago. Verifique a conexão e as credenciais.', error);
-        throw new Error('Ocorreu um erro de comunicação ao tentar criar a assinatura. Tente novamente mais tarde.');
+        throw new Error(error.message || 'Ocorreu um erro de comunicação ao tentar criar a assinatura. Tente novamente mais tarde.');
     }
 }
