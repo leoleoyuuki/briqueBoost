@@ -1,18 +1,22 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Star } from 'lucide-react';
+import { CheckCircle, Star, Loader2 } from 'lucide-react';
+import { createSubscriptionAction } from '@/lib/mercadopago-actions';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SubscriptionPage() {
     const router = useRouter();
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
+    const { toast } = useToast();
+    const [isSubscribing, setIsSubscribing] = useState(false);
 
     useEffect(() => {
         if (!isUserLoading && !user) {
@@ -28,8 +32,31 @@ export default function SubscriptionPage() {
     const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
 
     const handleSubscribe = async () => {
-        // This will be implemented in the next step.
-        alert('A mágica da assinatura acontecerá aqui!');
+        if (!user || !user.email) {
+            toast({
+                variant: 'destructive',
+                title: 'Erro',
+                description: 'Você precisa estar logado para assinar.',
+            });
+            return;
+        }
+
+        setIsSubscribing(true);
+        try {
+            const result = await createSubscriptionAction({ userEmail: user.email });
+            if (result.init_point) {
+                // Redirect user to Mercado Pago checkout
+                window.location.href = result.init_point;
+            }
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Erro ao criar assinatura',
+                description: error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.',
+            });
+        } finally {
+            setIsSubscribing(false);
+        }
     };
 
     const isLoading = isUserLoading || isProfileLoading;
@@ -89,9 +116,17 @@ export default function SubscriptionPage() {
                                 </ul>
                                 <Button 
                                     onClick={handleSubscribe} 
+                                    disabled={isSubscribing}
                                     className="w-full mt-auto bg-blue-600 hover:bg-blue-500 rounded-xl h-12 text-base font-medium"
                                 >
-                                    Assinar Agora
+                                    {isSubscribing ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Aguarde...
+                                        </>
+                                    ) : (
+                                        'Assinar Agora'
+                                    )}
                                 </Button>
                            </div>
                         </div>
