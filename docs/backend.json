@@ -76,6 +76,19 @@
         "itemsInStockForParts": {
           "type": "number",
           "description": "Count of items in stock with 'For Parts' condition."
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "The ID of the user's subscription in Mercado Pago."
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "description": "The current status of the user's subscription.",
+          "enum": ["active", "paused", "cancelled", "expired", "none"]
+        },
+        "planId": {
+          "type": "string",
+          "description": "The ID of the subscription plan the user is subscribed to."
         }
       },
       "required": [
