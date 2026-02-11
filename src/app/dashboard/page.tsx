@@ -244,13 +244,10 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    
+                <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
-                        
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
-                        
                         <div className="relative">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="p-3 bg-blue-500/10 rounded-2xl">
@@ -260,28 +257,19 @@ export default function DashboardPage() {
                                     <MoreVertical className="w-5 h-5 text-slate-400" />
                                 </button>
                             </div>
-                            
                             <div className="mb-4">
-                                <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Faturamento Bruto
-                                </p>
+                                <p className="text-slate-400 text-sm font-medium mb-2">Faturamento Bruto</p>
                                 <p className="text-4xl font-bold mb-1">
-                                    {new Intl.NumberFormat('pt-BR', { 
-                                        style: 'currency', 
-                                        currency: 'BRL',
-                                    }).format(stats.totalRevenue)}
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalRevenue)}
                                 </p>
                             </div>
-                            
                             <ChangeIndicator change={monthlyChanges.revenue.change} isPositive={monthlyChanges.revenue.isPositive} />
                         </div>
                     </div>
 
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
-                        
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl" />
-                        
                         <div className="relative">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="p-3 bg-emerald-500/10 rounded-2xl">
@@ -291,133 +279,82 @@ export default function DashboardPage() {
                                     <MoreVertical className="w-5 h-5 text-slate-400" />
                                 </button>
                             </div>
-                            
                             <div className="mb-4">
-                                <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Lucro Líquido
-                                </p>
+                                <p className="text-slate-400 text-sm font-medium mb-2">Lucro Líquido</p>
                                 <p className="text-4xl font-bold mb-1">
-                                    {new Intl.NumberFormat('pt-BR', { 
-                                        style: 'currency', 
-                                        currency: 'BRL',
-                                    }).format(stats.totalProfit)}
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(stats.totalProfit)}
                                 </p>
                             </div>
-                            
                             <ChangeIndicator change={monthlyChanges.profit.change} isPositive={monthlyChanges.profit.isPositive} />
                         </div>
                     </div>
+                </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
-                        
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl" />
-                        
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 mt-6">
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-purple-500/10 rounded-2xl">
-                                    <PiggyBank className="w-6 h-6 text-purple-400" strokeWidth={2.5} />
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="p-2.5 bg-purple-500/10 rounded-2xl">
+                                    <PiggyBank className="w-5 h-5 text-purple-400" strokeWidth={2.5} />
                                 </div>
-                                <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
-                                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                                </button>
                             </div>
-                            
-                            <div className="mb-4">
-                                <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Investimento Total
-                                </p>
-                                <p className="text-4xl font-bold mb-1">
-                                    {new Intl.NumberFormat('pt-BR', { 
-                                        style: 'currency', 
-                                        currency: 'BRL',
-                                    }).format(stats.totalInvestment)}
+                            <div className="mb-2">
+                                <p className="text-slate-400 text-sm font-medium mb-1">Investimento Total</p>
+                                <p className="text-3xl font-bold">
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalInvestment)}
                                 </p>
                             </div>
-                            
                             <ChangeIndicator change={monthlyChanges.investment.change} isPositive={monthlyChanges.investment.isPositive} />
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
-                        
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 rounded-full blur-3xl" />
-                        
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-orange-500/10 rounded-2xl">
-                                    <ShoppingCart className="w-6 h-6 text-orange-400" strokeWidth={2.5} />
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="p-2.5 bg-orange-500/10 rounded-2xl">
+                                    <ShoppingCart className="w-5 h-5 text-orange-400" strokeWidth={2.5} />
                                 </div>
-                                <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
-                                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                                </button>
                             </div>
-                            
-                            <div className="mb-4">
-                                <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Total de Itens Vendidos
-                                </p>
-                                <p className="text-4xl font-bold mb-1">
-                                    {stats.totalItemsSold}
-                                </p>
+                            <div className="mb-2">
+                                <p className="text-slate-400 text-sm font-medium mb-1">Total de Itens Vendidos</p>
+                                <p className="text-3xl font-bold">{stats.totalItemsSold}</p>
                             </div>
-                            
                             <ChangeIndicator change={monthlyChanges.itemsSold.change} isPositive={monthlyChanges.itemsSold.isPositive} />
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
-                        
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl" />
-                        
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-pink-500/10 rounded-2xl">
-                                    <Package className="w-6 h-6 text-pink-400" strokeWidth={2.5} />
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="p-2.5 bg-pink-500/10 rounded-2xl">
+                                    <Package className="w-5 h-5 text-pink-400" strokeWidth={2.5} />
                                 </div>
-                                <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
-                                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                                </button>
                             </div>
-                            
-                            <div className="mb-4">
-                                <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Em Estoque
-                                </p>
-                                <p className="text-4xl font-bold mb-1">
-                                    {stats.itemsInStock}
-                                </p>
+                            <div className="mb-2">
+                                <p className="text-slate-400 text-sm font-medium mb-1">Em Estoque</p>
+                                <p className="text-3xl font-bold">{stats.itemsInStock}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
-                        
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl" />
-                        
+                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/20 rounded-full blur-3xl" />
                         <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-teal-500/10 rounded-2xl">
-                                    <TrendingUp className="w-6 h-6 text-teal-400" strokeWidth={2.5} />
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="p-2.5 bg-teal-500/10 rounded-2xl">
+                                    <TrendingUp className="w-5 h-5 text-teal-400" strokeWidth={2.5} />
                                 </div>
-                                <button className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors">
-                                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                                </button>
                             </div>
-                            
-                            <div className="mb-4">
-                                <p className="text-slate-400 text-sm font-medium mb-2">
-                                    Margem Média
-                                </p>
-                                <p className="text-4xl font-bold mb-1">
+                            <div className="mb-2">
+                                <p className="text-slate-400 text-sm font-medium mb-1">Margem Média</p>
+                                <p className="text-3xl font-bold">
                                     {(stats.averageProfitMargin * 100).toFixed(1)}%
                                 </p>
                             </div>
-                            
-                             <ChangeIndicator change={monthlyChanges.avgMargin.change} isPositive={monthlyChanges.avgMargin.isPositive} />
+                            <ChangeIndicator change={monthlyChanges.avgMargin.change} isPositive={monthlyChanges.avgMargin.isPositive} />
                         </div>
                     </div>
                 </div>
