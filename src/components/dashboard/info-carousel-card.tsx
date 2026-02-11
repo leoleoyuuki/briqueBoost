@@ -40,7 +40,7 @@ export function InfoCarouselCard() {
     <div
       className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                    rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
-                   transition-all duration-300 h-full flex flex-col"
+                   transition-all duration-300 flex flex-col min-h-[240px]"
     >
       <div
         className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl 

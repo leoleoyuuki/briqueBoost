@@ -423,10 +423,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                    
-                    <div className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl overflow-hidden">
-                        
+                    <div className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
                         <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
                                 <h3 className="text-xl font-bold mb-1">Análise de Performance</h3>
@@ -439,122 +436,28 @@ export default function DashboardPage() {
                                 </TabsList>
                             </Tabs>
                         </div>
-                        
                         <div className="p-6">
                             <ProfitChart summaries={monthlySummaries} isLoading={areSummariesLoading} view={chartView} />
                         </div>
                     </div>
                     
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl overflow-hidden">
-                        
-                        <div className="p-6 border-b border-slate-800">
-                            <div className="flex items-center justify-between mb-2">
-                                <div>
-                                    <h3 className="text-xl font-bold mb-1">Vendas por Categoria</h3>
-                                    <p className="text-slate-400 text-sm">Este mês vs passado</p>
-                                </div>
-                                <button className="p-2 hover:bg-slate-800 rounded-xl transition-colors">
-                                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div className="p-6">
-                           <ItemSummary userProfile={userProfile} isLoading={isProfileLoading} />
-                        </div>
-                    </div>
-                </div>
+                    <div className="space-y-6">
+                        <InfoCarouselCard />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-                    
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
-                                  transition-all duration-300">
-                        
-                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl 
-                                      group-hover:bg-blue-500/20 transition-all duration-300" />
-                        
-                        <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-slate-800 rounded-2xl">
-                                    <span className="text-3xl">📦</span>
+                        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+                            <div className="p-6 border-b border-slate-800">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-xl font-bold mb-1">Itens por Condição</h3>
+                                        <p className="text-slate-400 text-sm">Resumo do seu estoque atual.</p>
+                                    </div>
+                                    <button className="p-2 hover:bg-slate-800 rounded-xl transition-colors">
+                                        <MoreVertical className="w-5 h-5 text-slate-400" />
+                                    </button>
                                 </div>
-                                <button className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors">
-                                    <ArrowUpRight className="w-4 h-4" />
-                                </button>
                             </div>
-                            
-                            <div>
-                                <p className="text-5xl font-bold mb-2">{stats.itemsInStock}</p>
-                                <p className="text-slate-400 text-sm mb-3">produtos</p>
-                                <p className="text-xs text-slate-500">
-                                    <span className="text-red-400 font-semibold">12 itens</span> aguardando confirmação
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <InfoCarouselCard />
-
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
-                                  transition-all duration-300">
-                        
-                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl 
-                                      group-hover:bg-emerald-500/20 transition-all duration-300" />
-                        
-                        <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-slate-800 rounded-2xl">
-                                    <span className="text-3xl">✅</span>
-                                </div>
-                                <button className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors">
-                                    <ArrowUpRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                            
-                            <div>
-                                <p className="text-5xl font-bold mb-2">{stats.totalItemsSold}</p>
-                                <p className="text-slate-400 text-sm mb-3">vendidos</p>
-                                <p className="text-xs text-slate-500">
-                                    <span className="text-emerald-400 font-semibold">Taxa de conversão: 
-                                    {stats.totalItemsSold > 0 ? ((stats.totalItemsSold / (stats.totalItemsSold + stats.itemsInStock)) * 100).toFixed(1) : 0}%</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                                  rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
-                                  transition-all duration-300">
-                        
-                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-500/10 rounded-full blur-2xl 
-                                      group-hover:bg-pink-500/20 transition-all duration-300" />
-                        
-                        <div className="relative">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="p-3 bg-slate-800 rounded-2xl">
-                                    <span className="text-3xl">💰</span>
-                                </div>
-                                <button className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors">
-                                    <ArrowUpRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                            
-                            <div>
-                                <p className="text-5xl font-bold mb-2">
-                                    {new Intl.NumberFormat('pt-BR', { 
-                                        style: 'currency', 
-                                        currency: 'BRL',
-                                    }).format(stats.totalProfit)}
-                                </p>
-                                <p className="text-slate-400 text-sm mb-3">lucro líquido</p>
-                                <p className="text-xs text-slate-500">
-                                    Margem: <span className="text-pink-400 font-semibold">
-                                        {(stats.averageProfitMargin * 100).toFixed(1)}%
-                                    </span>
-                                </p>
+                            <div className="p-6">
+                               <ItemSummary userProfile={userProfile} isLoading={isProfileLoading} />
                             </div>
                         </div>
                     </div>
