@@ -1,7 +1,5 @@
 'use server';
 
-import * as mercadopago from 'mercadopago';
-
 interface CreateSubscriptionInput {
     userEmail: string;
 }
@@ -15,17 +13,8 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
         throw new Error('O pagamento não está configurado. Por favor, contate o suporte.');
     }
     
-    // The base URL should be in your environment variables.
-    // Using localhost for now as a fallback.
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
     
-    const client = new mercadopago.MercadoPagoConfig({ 
-        accessToken,
-        options: { timeout: 5000 }
-    });
-    
-    const subscription = new mercadopago.Subscription(client);
-
     const createPayload = {
         reason: 'Assinatura BriqueBoost Pro',
         auto_recurring: {
@@ -36,21 +25,35 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
         },
         back_url: `${baseUrl}/subscription`, // User is redirected here after payment
         payer_email: userEmail,
+        preapproval_plan_id: process.env.MERCADOPAGO_PLAN_ID,
     };
 
     try {
-        const response = await subscription.create({ body: createPayload });
+        const response = await fetch('https://api.mercadopago.com/preapproval', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(createPayload),
+        });
 
-        if (response.id && response.init_point) {
-            // The init_point is the URL where the user should be redirected to complete the payment.
-            return { init_point: response.init_point };
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            console.error('Mercado Pago API error:', responseData);
+            throw new Error(responseData.message || 'Não foi possível iniciar o processo de assinatura. Tente novamente.');
+        }
+
+        if (responseData.init_point) {
+            return { init_point: responseData.init_point };
         } else {
-            console.error('Mercado Pago response is missing init_point:', response);
+            console.error('Mercado Pago response is missing init_point:', responseData);
             throw new Error('Não foi possível iniciar o processo de assinatura. Tente novamente.');
         }
 
     } catch (error: any) {
-        console.error('Mercado Pago API error:', error.cause || error.message);
+        console.error('Mercado Pago fetch error:', error);
         throw new Error('Ocorreu um erro ao comunicar com o Mercado Pago. Tente novamente mais tarde.');
     }
 }
