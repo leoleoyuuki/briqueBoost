@@ -1,6 +1,6 @@
 'use server';
 
-import { MercadoPagoConfig, PreApproval } from 'mercadopago';
+import { MercadoPagoConfig, Subscription } from 'mercadopago';
 
 interface CreateSubscriptionInput {
     userEmail: string;
@@ -24,7 +24,7 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
         options: { timeout: 5000 }
     });
     
-    const preApproval = new PreApproval(client);
+    const subscription = new Subscription(client);
 
     const createPayload = {
         reason: 'Assinatura BriqueBoost Pro',
@@ -39,7 +39,7 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
     };
 
     try {
-        const response = await preApproval.create({ body: createPayload });
+        const response = await subscription.create({ body: createPayload });
 
         if (response.id && response.init_point) {
             // The init_point is the URL where the user should be redirected to complete the payment.
