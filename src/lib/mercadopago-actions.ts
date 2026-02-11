@@ -12,20 +12,19 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
         console.error('Mercado Pago access token is not configured.');
         throw new Error('O pagamento não está configurado. Por favor, contate o suporte.');
     }
+
+    const planId = process.env.MERCADOPAGO_PLAN_ID;
+    if (!planId) {
+        console.error('Mercado Pago plan ID is not configured.');
+        throw new Error('O plano de assinatura não está configurado. Por favor, contate o suporte.');
+    }
     
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
     
     const createPayload = {
-        reason: 'Assinatura BriqueBoost Pro',
-        auto_recurring: {
-            frequency: 1,
-            frequency_type: 'months' as 'months',
-            transaction_amount: 29.90,
-            currency_id: 'BRL' as 'BRL',
-        },
-        back_url: `${baseUrl}/subscription`, // User is redirected here after payment
+        preapproval_plan_id: planId,
         payer_email: userEmail,
-        preapproval_plan_id: process.env.MERCADOPAGO_PLAN_ID,
+        back_url: `${baseUrl}/subscription`, // User is redirected here after payment
     };
 
     try {
