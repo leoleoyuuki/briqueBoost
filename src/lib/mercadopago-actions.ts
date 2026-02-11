@@ -40,19 +40,24 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
         const responseData = await response.json();
 
         if (!response.ok) {
-            console.error('Mercado Pago API error:', responseData);
-            throw new Error(responseData.message || 'Não foi possível iniciar o processo de assinatura. Tente novamente.');
+            console.error('Mercado Pago API error:', {
+                status: response.status,
+                statusText: response.statusText,
+                body: responseData
+            });
+            const errorMessage = responseData.message || 'Não foi possível iniciar o processo de assinatura. Por favor, verifique as configurações.';
+            throw new Error(errorMessage);
         }
 
         if (responseData.init_point) {
             return { init_point: responseData.init_point };
         } else {
             console.error('Mercado Pago response is missing init_point:', responseData);
-            throw new Error('Não foi possível iniciar o processo de assinatura. Tente novamente.');
+            throw new Error('Não foi possível obter o link de pagamento. Tente novamente.');
         }
 
     } catch (error: any) {
-        console.error('Mercado Pago fetch error:', error);
-        throw new Error('Ocorreu um erro ao comunicar com o Mercado Pago. Tente novamente mais tarde.');
+        console.error('Falha na comunicação com a API do Mercado Pago. Verifique a conexão e as credenciais.', error);
+        throw new Error('Ocorreu um erro de comunicação ao tentar criar a assinatura. Tente novamente mais tarde.');
     }
 }
