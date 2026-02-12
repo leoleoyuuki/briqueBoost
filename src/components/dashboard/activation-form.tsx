@@ -14,8 +14,11 @@ import { Terminal, KeyRound, LogOut, MessageCircle } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { addMonths } from 'date-fns';
 
+interface ActivationFormProps {
+    isExpired?: boolean;
+}
 
-export function ActivationForm() {
+export function ActivationForm({ isExpired }: ActivationFormProps) {
     const { user } = useUser();
     const firestore = useFirestore();
     const auth = useAuth();
@@ -106,8 +109,15 @@ export function ActivationForm() {
             <div className="bg-blue-500/10 p-4 rounded-full mb-6">
                 <KeyRound className="h-10 w-10 text-blue-400" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Ative Sua Conta</h1>
-            <p className="text-slate-400 mb-8">Por favor, insira o código de ativação que você recebeu para ter acesso total à plataforma.</p>
+            <h1 className="text-3xl font-bold text-white mb-2">
+                {isExpired ? 'Seu Acesso Expirou' : 'Ative Sua Conta'}
+            </h1>
+            <p className="text-slate-400 mb-8">
+                {isExpired 
+                    ? 'Sua assinatura terminou. Por favor, insira um novo código de ativação para continuar.'
+                    : 'Por favor, insira o código de ativação que você recebeu para ter acesso total à plataforma.'
+                }
+            </p>
 
             <form onSubmit={handleActivation} className="w-full max-w-sm space-y-4">
                 {error && (

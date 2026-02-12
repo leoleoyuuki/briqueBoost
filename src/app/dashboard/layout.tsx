@@ -68,10 +68,12 @@ export default function DashboardLayout({
     );
   }
 
-  if (userProfile?.accountStatus === 'pending') {
+  const isExpired = userProfile?.expiresAt && userProfile.expiresAt.toDate() < new Date();
+  
+  if (userProfile?.accountStatus === 'pending' || isExpired) {
     return (
         <div className="min-h-screen bg-slate-950 p-4 md:p-8 flex items-center justify-center">
-            <ActivationForm />
+            <ActivationForm isExpired={isExpired} />
         </div>
     )
   }
