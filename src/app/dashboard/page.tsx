@@ -390,14 +390,16 @@ export default function DashboardPage() {
                                     <Download className="w-4 h-4" />
                                     Exportar
                                 </button>
-                                <Link href="/inventory/new" id="tour-add-item-button">
-                                    <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
-                                                    text-white rounded-xl transition-all duration-200 
-                                                    flex items-center gap-2 font-medium text-sm">
-                                        <Plus className="w-4 h-4" />
-                                        Adicionar Item
-                                    </button>
-                                </Link>
+                                <div id="tour-add-item-button">
+                                    <Link href="/inventory/new">
+                                        <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
+                                                        text-white rounded-xl transition-all duration-200 
+                                                        flex items-center gap-2 font-medium text-sm">
+                                            <Plus className="w-4 h-4" />
+                                            Adicionar Item
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
