@@ -107,14 +107,12 @@ service cloud.firestore {
       allow get: if isOwner(userId);
       allow list: if false; // Security: Prevent user enumeration.
       allow create: if isOwner(userId) && hasValidUserData(userId);
-      // Allow updates if the user is the owner, core fields are immutable, and status isn't being maliciously changed.
-      // This rule permits changing name, counters, and activation fields like `expiresAt`.
+      // Allow updates if the user is the owner and core fields are immutable.
+      // This is necessary for the client-side activation flow to update accountStatus and expiresAt.
       allow update: if isOwner(userId)
                     && isImmutable('id')
                     && isImmutable('email')
-                    && isImmutable('createdAt')
-                    // Prevent a user from deactivating their own account.
-                    && request.resource.data.accountStatus == 'active';
+                    && isImmutable('createdAt');
       allow delete: if isExistingOwner(userId);
 
       /**

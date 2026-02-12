@@ -293,7 +293,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Activation Code",
       "type": "object",
-      "description": "Represents an activation code for user accounts.",
+      "description": "Represents a redeemable code that grants a user access for a specific duration.",
       "properties": {
         "id": {
           "type": "string",
@@ -301,30 +301,28 @@
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Timestamp indicating when the code was created."
         },
         "durationInMonths": {
-            "type": "number",
-            "description": "The duration for which the code is valid, in months."
-        },
-        "expiresAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Timestamp indicating when the code expires."
+          "type": "number",
+          "description": "The number of months of access this code grants upon activation."
         },
         "isUsed": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether this code has already been redeemed."
         },
         "usedAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Timestamp indicating when the code was redeemed."
         },
         "usedBy": {
           "type": "string",
-          "description": "UID of the user who used the code."
+          "description": "UID of the user who redeemed the code."
         }
       },
-      "required": ["id", "createdAt", "isUsed", "durationInMonths", "expiresAt"]
+      "required": ["id", "createdAt", "isUsed", "durationInMonths"]
     }
   },
   "auth": {

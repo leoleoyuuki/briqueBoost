@@ -6,7 +6,7 @@ import { collection, doc, query, orderBy, setDoc, Timestamp, deleteDoc } from 'f
 import type { ActivationCode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Check, KeySquare, ShieldCheck, ShieldX, Trash2 } from 'lucide-react';
+import { Copy, Check, KeySquare, ShieldCheck, ShieldX, Trash2, Clock } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from '@/components/ui/badge';
-import { addMonths, format } from 'date-fns';
+import { format } from 'date-fns';
 
 // Helper function to generate a random code
 function generateCode() {
@@ -94,15 +94,12 @@ export default function GenerateCodesPage() {
             const newCode = generateCode();
             const codeRef = doc(firestore, 'activationCodes', newCode);
             
-            const now = new Date();
             const durationInMonths = parseInt(duration, 10);
-            const expiresAt = addMonths(now, durationInMonths);
 
             await setDoc(codeRef, {
                 id: newCode,
-                createdAt: Timestamp.fromDate(now),
+                createdAt: Timestamp.now(),
                 durationInMonths: durationInMonths,
-                expiresAt: Timestamp.fromDate(expiresAt),
                 isUsed: false,
                 usedBy: null,
                 usedAt: null,
@@ -166,7 +163,6 @@ export default function GenerateCodesPage() {
                                 <TableHead className="text-slate-400">Status</TableHead>
                                 <TableHead className="text-slate-400">Duração</TableHead>
                                 <TableHead className="text-slate-400">Criado em</TableHead>
-                                <TableHead className="text-slate-400">Expira em</TableHead>
                                 <TableHead className="text-slate-400">Usado por</TableHead>
                                 <TableHead className="text-slate-400">Usado em</TableHead>
                                 <TableHead className="text-right text-slate-400">Ações</TableHead>
@@ -175,7 +171,7 @@ export default function GenerateCodesPage() {
                         <TableBody>
                             {isLoading && Array.from({length: 3}).map((_, i) => (
                                 <TableRow key={i} className="border-slate-800">
-                                    <TableCell colSpan={8} className="py-2">
+                                    <TableCell colSpan={7} className="py-2">
                                         <div className="h-8 animate-pulse rounded-md bg-slate-800" />
                                     </TableCell>
                                 </TableRow>
@@ -191,21 +187,20 @@ export default function GenerateCodesPage() {
                                                  <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
                                                  Utilizado
                                              </Badge>
-                                        ) : (code.expiresAt && new Date() > code.expiresAt.toDate()) ? (
-                                            <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/20 font-medium">
-                                                <ShieldX className="h-3.5 w-3.5 mr-1.5" />
-                                                Expirado
-                                            </Badge>
                                         ) : (
-                                            <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/20">
-                                                <ShieldX className="h-3.5 w-3.5 mr-1.5" />
+                                            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">
+                                                <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
                                                 Disponível
                                             </Badge>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-slate-400">{code.durationInMonths} {code.durationInMonths > 1 ? 'meses' : 'mês'}</TableCell>
+                                    <TableCell className="text-slate-400">
+                                        <div className='flex items-center gap-2'>
+                                            <Clock className="w-4 h-4 text-slate-500"/>
+                                            {code.durationInMonths} {code.durationInMonths > 1 ? 'meses' : 'mês'}
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="text-slate-400">{formatDate(code.createdAt)}</TableCell>
-                                    <TableCell className="text-slate-400">{formatDate(code.expiresAt)}</TableCell>
                                     <TableCell className="text-slate-400 font-mono text-xs">{code.usedBy || '-'}</TableCell>
                                     <TableCell className="text-slate-400">{formatDate(code.usedAt)}</TableCell>
                                     <TableCell className="text-right">

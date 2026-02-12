@@ -39,21 +39,16 @@ export function ActivationForm({ isExpired }: ActivationFormProps) {
 
         try {
             const codeSnap = await getDoc(codeRef);
-            const codeData = codeSnap.data();
-
-            if (!codeSnap.exists() || codeData?.isUsed) {
+            
+            if (!codeSnap.exists() || codeSnap.data()?.isUsed) {
                 setError('Código de ativação inválido ou já utilizado.');
                 setIsLoading(false);
                 return;
             }
-
-            if (codeData.expiresAt && codeData.expiresAt.toDate() < new Date()) {
-                setError('Este código de ativação expirou.');
-                setIsLoading(false);
-                return;
-            }
-
+            
+            const codeData = codeSnap.data();
             const durationInMonths = codeData.durationInMonths as number;
+
             if (typeof durationInMonths !== 'number' || durationInMonths <= 0) {
                 setError('O código de ativação é inválido (duração não especificada).');
                 setIsLoading(false);
@@ -61,9 +56,16 @@ export function ActivationForm({ isExpired }: ActivationFormProps) {
             }
             
             const now = new Date();
-            const expirationDate = addMonths(now, durationInMonths);
+            // If user's subscription is expired, start new subscription from now.
+            // Otherwise, extend the current subscription.
+            const userProfileSnap = await getDoc(userRef);
+            const userProfile = userProfileSnap.data();
+            const currentExpiry = userProfile?.expiresAt?.toDate();
+            const startDate = (currentExpiry && currentExpiry > now) ? currentExpiry : now;
 
-            // Code is valid and unused, perform batch write
+            const expirationDate = addMonths(startDate, durationInMonths);
+
+            // Code is valid, perform batch write
             const batch = writeBatch(firestore);
 
             batch.update(codeRef, {
@@ -86,9 +88,9 @@ export function ActivationForm({ isExpired }: ActivationFormProps) {
             });
             // The dashboard will re-render due to the user profile update
         } catch (err: any) {
-            console.error(err);
+            console.error("Activation Error:", err);
             if (err.code === 'permission-denied') {
-                setError('Você não tem permissão para usar este código.');
+                setError('Você não tem permissão para realizar esta ação.');
             } else {
                 setError(err.message || 'Ocorreu um erro ao ativar a conta.');
             }
@@ -114,7 +116,7 @@ export function ActivationForm({ isExpired }: ActivationFormProps) {
             </h1>
             <p className="text-slate-400 mb-8">
                 {isExpired 
-                    ? 'Sua assinatura terminou. Por favor, insira um novo código de ativação para continuar.'
+                    ? 'Sua assinatura terminou. Por favor, insira um novo código de ativação para reativar ou estender seu acesso.'
                     : 'Por favor, insira o código de ativação que você recebeu para ter acesso total à plataforma.'
                 }
             </p>
