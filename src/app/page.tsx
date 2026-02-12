@@ -18,7 +18,8 @@ import {
   X,
   Users,
   User,
-  Percent
+  Percent,
+  ShoppingCart
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 
@@ -110,11 +111,14 @@ export default function App() {
           </div>
 
           <div className="relative max-w-5xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-1 bg-slate-900 text-white p-6 rounded-[2rem] flex flex-col justify-between h-48 shadow-xl transform md:-rotate-2 border border-slate-800">
-              <Settings className="w-8 h-8 text-blue-400" />
-              <div>
-                <div className="text-3xl font-bold">100+</div>
-                <div className="text-xs opacity-70 font-medium">Clientes Ativos</div>
+            <div className="md:col-span-1 bg-slate-900 p-6 rounded-[2rem] shadow-xl transform md:-rotate-2 border border-slate-800 relative overflow-hidden flex flex-col justify-between h-48">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/20 rounded-full blur-3xl" />
+              <div className="relative p-2.5 bg-orange-500/10 rounded-2xl w-fit">
+                <ShoppingCart className="w-5 h-5 text-orange-400" strokeWidth={2.5} />
+              </div>
+              <div className="relative">
+                <div className="text-3xl font-bold text-white">1951+</div>
+                <div className="text-xs text-slate-400 font-medium">Itens Vendidos</div>
               </div>
             </div>
             
@@ -133,11 +137,14 @@ export default function App() {
               </div>
             </div>
 
-            <div className="md:col-span-1 bg-blue-600 text-white p-6 rounded-[2rem] flex flex-col justify-between h-48 shadow-xl transform md:rotate-2">
-              <TrendingUp className="w-8 h-8" />
-              <div>
-                <div className="text-3xl font-bold">1951+</div>
-                <div className="text-xs font-bold opacity-80 uppercase tracking-tighter">Itens Gerenciados</div>
+            <div className="md:col-span-1 bg-blue-600 p-6 rounded-[2rem] shadow-xl transform md:rotate-2 relative overflow-hidden flex flex-col justify-between h-48">
+               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-3xl" />
+               <div className="relative p-2.5 bg-white/20 rounded-2xl w-fit">
+                    <Package className="w-5 h-5 text-white" strokeWidth={2.5} />
+                </div>
+              <div className="relative">
+                <div className="text-3xl font-bold text-white">400+</div>
+                <div className="text-xs text-blue-200 font-medium">Itens em Estoque</div>
               </div>
             </div>
           </div>
