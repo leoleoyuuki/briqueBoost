@@ -23,7 +23,7 @@ export default function SupportLayout({
 
   useEffect(() => {
     if (!isUserLoading && !user) {
-      router.replace('/');
+      router.replace('/login');
     }
   }, [user, isUserLoading, router]);
 

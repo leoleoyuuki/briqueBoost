@@ -23,7 +23,7 @@ export default function InventoryLayout({
 
   useEffect(() => {
     if (!isUserLoading && !user) {
-      router.replace('/');
+      router.replace('/login');
     }
   }, [user, isUserLoading, router]);
 

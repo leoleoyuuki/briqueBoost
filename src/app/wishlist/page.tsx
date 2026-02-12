@@ -16,7 +16,7 @@ export default function WishlistPage() {
 
     useEffect(() => {
         if (!isUserLoading && !user) {
-            router.push('/');
+            router.push('/login');
         }
     }, [isUserLoading, user, router]);
 

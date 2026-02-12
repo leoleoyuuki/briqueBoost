@@ -25,7 +25,7 @@ export default function InventoryPage() {
 
     useEffect(() => {
         if (!isUserLoading && !user) {
-            router.push('/');
+            router.push('/login');
         }
     }, [isUserLoading, user, router]);
 

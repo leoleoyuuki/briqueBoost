@@ -107,7 +107,7 @@ export function SignupForm() {
             </Button>
             <div className="text-center text-sm text-slate-400">
                 Já tem uma conta?{" "}
-                <Link href="/" className="underline text-blue-400 hover:text-blue-300">
+                <Link href="/login" className="underline text-blue-400 hover:text-blue-300">
                   Faça login
                 </Link>
             </div>

@@ -101,7 +101,7 @@ export function ActivationForm({ isExpired }: ActivationFormProps) {
     
     const handleLogout = async () => {
         await signOut(auth);
-        router.push('/');
+        router.push('/login');
     };
 
     const whatsappLink = "https://wa.me/5511957211546?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20um%20c%C3%B3digo%20de%20ativa%C3%A7%C3%A3o%20para%20o%20BriqueBoost.";
