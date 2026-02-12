@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useUser, useFirestore, useCollection, setDocumentNonBlocking, useMemoFirebase } from '@/firebase';
-import { collection, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, query, orderBy, setDoc } from 'firebase/firestore';
 import type { ActivationCode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
