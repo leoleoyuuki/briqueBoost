@@ -38,13 +38,13 @@ export function InfoCarouselCard() {
 
   return (
     <div
-      className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 
-                   rounded-3xl p-6 relative overflow-hidden group hover:bg-slate-900/70 
+      className="bg-gradient-to-br from-slate-900 to-slate-800 backdrop-blur-xl border border-slate-700 
+                   rounded-3xl p-6 relative overflow-hidden group 
                    transition-all duration-300 flex flex-col min-h-[220px] md:min-h-[240px]"
     >
       <div
-        className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl 
-                       group-hover:bg-purple-500/20 transition-all duration-300"
+        className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl 
+                       group-hover:bg-blue-500/20 transition-all duration-300"
       />
 
       <div className="relative flex-1 flex flex-col">
