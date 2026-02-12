@@ -278,8 +278,8 @@ export default function App() {
       {/* Footer */}
       <footer className="bg-slate-950 border-t border-slate-800 pt-20 pb-10">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-            <div className="col-span-1 md:col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+            <div className="col-span-1">
               <Link href="/" className="flex items-center gap-2 mb-6">
                 <div className="bg-blue-600 text-white p-1 rounded-lg">
                   <Logo className="w-5 h-5" />
@@ -307,17 +307,6 @@ export default function App() {
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Contato</a></li>
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Privacidade</a></li>
               </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-white mb-6">Newsletter</h4>
-              <p className="text-sm text-slate-400 mb-4 font-medium">Dicas de revenda no seu e-mail.</p>
-              <div className="flex gap-2">
-                <input type="email" placeholder="E-mail" className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button className="bg-slate-800 text-white p-2 rounded-xl hover:bg-slate-700 transition-colors">
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
             </div>
           </div>
           
