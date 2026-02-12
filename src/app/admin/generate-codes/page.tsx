@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, doc, query, orderBy, setDoc, Timestamp } from 'firebase/firestore';
+import { collection, doc, query, orderBy, setDoc, Timestamp, deleteDoc } from 'firebase/firestore';
 import type { ActivationCode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Check, KeySquare, ShieldCheck, ShieldX } from 'lucide-react';
+import { Copy, Check, KeySquare, ShieldCheck, ShieldX, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -22,6 +22,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from '@/components/ui/badge';
 import { addMonths, format } from 'date-fns';
@@ -106,6 +117,18 @@ export default function GenerateCodesPage() {
         }
     };
     
+    const handleDeleteCode = async (codeId: string) => {
+        if (!user) return;
+        try {
+            const codeRef = doc(firestore, 'activationCodes', codeId);
+            await deleteDoc(codeRef);
+            toast({ title: 'Código excluído com sucesso!' });
+        } catch (error) {
+            console.error(error);
+            toast({ variant: 'destructive', title: 'Erro ao excluir código.' });
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl">
@@ -146,12 +169,13 @@ export default function GenerateCodesPage() {
                                 <TableHead className="text-slate-400">Expira em</TableHead>
                                 <TableHead className="text-slate-400">Usado por</TableHead>
                                 <TableHead className="text-slate-400">Usado em</TableHead>
+                                <TableHead className="text-right text-slate-400">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading && Array.from({length: 3}).map((_, i) => (
                                 <TableRow key={i} className="border-slate-800">
-                                    <TableCell colSpan={7} className="py-2">
+                                    <TableCell colSpan={8} className="py-2">
                                         <div className="h-8 animate-pulse rounded-md bg-slate-800" />
                                     </TableCell>
                                 </TableRow>
@@ -184,6 +208,27 @@ export default function GenerateCodesPage() {
                                     <TableCell className="text-slate-400">{formatDate(code.expiresAt)}</TableCell>
                                     <TableCell className="text-slate-400 font-mono text-xs">{code.usedBy || '-'}</TableCell>
                                     <TableCell className="text-slate-400">{formatDate(code.usedAt)}</TableCell>
+                                    <TableCell className="text-right">
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent className="bg-slate-900 border-slate-800">
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                                    <AlertDialogDescription className="text-slate-400">
+                                                        Esta ação não pode ser desfeita. Isso excluirá permanentemente o código de ativação.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDeleteCode(code.id)} className="bg-red-600 hover:bg-red-500">Excluir</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

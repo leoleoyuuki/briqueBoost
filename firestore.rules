@@ -175,7 +175,7 @@ service cloud.firestore {
                     // Ensure no other fields are being changed except the 'used' ones
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isUsed', 'usedBy', 'usedAt']);
 
-      allow delete: if false;
+      allow delete: if isAdmin();
     }
   }
 }
