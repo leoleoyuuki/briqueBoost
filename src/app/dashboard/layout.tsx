@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -54,6 +54,16 @@ export default function DashboardLayout({
 
   const isLoading = isUserLoading || isProfileLoading;
 
+  const isExpired = !isLoading && userProfile?.expiresAt && userProfile.expiresAt.toDate() < new Date();
+
+  // When account expires, set its status back to 'pending'
+  useEffect(() => {
+    if (isExpired && user && userProfile?.accountStatus === 'active') {
+        const userRef = doc(firestore, 'users', user.uid);
+        updateDocumentNonBlocking(userRef, { accountStatus: 'pending' });
+    }
+  }, [isExpired, user, userProfile, firestore]);
+
   if (isLoading || !user) {
      return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
@@ -68,12 +78,10 @@ export default function DashboardLayout({
     );
   }
 
-  const isExpired = userProfile?.expiresAt && userProfile.expiresAt.toDate() < new Date();
-  
   if (userProfile?.accountStatus === 'pending' || isExpired) {
     return (
         <div className="min-h-screen bg-slate-950 p-4 md:p-8 flex items-center justify-center">
-            <ActivationForm isExpired={isExpired} />
+            <ActivationForm isExpired={!!isExpired} />
         </div>
     )
   }
