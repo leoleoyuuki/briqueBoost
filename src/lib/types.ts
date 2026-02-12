@@ -34,6 +34,8 @@ export type WishlistItem = {
 export type ActivationCode = {
     id: string;
     createdAt: any; // Timestamp
+    durationInMonths: number;
+    expiresAt: any; // Timestamp
     isUsed: boolean;
     usedAt?: any; // Timestamp
     usedBy?: string; // user UID

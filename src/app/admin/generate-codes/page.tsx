@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useUser, useFirestore, useCollection, setDocumentNonBlocking, useMemoFirebase } from '@/firebase';
-import { collection, doc, serverTimestamp, query, orderBy, setDoc } from 'firebase/firestore';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, doc, query, orderBy, setDoc, Timestamp } from 'firebase/firestore';
 import type { ActivationCode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -15,8 +15,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { addMonths, format } from 'date-fns';
 
 // Helper function to generate a random code
 function generateCode() {
@@ -59,6 +67,7 @@ export default function GenerateCodesPage() {
     const firestore = useFirestore();
     const { toast } = useToast();
     const [isGenerating, setIsGenerating] = useState(false);
+    const [duration, setDuration] = useState('1');
 
     const codesQuery = useMemoFirebase(() => {
         if (!user) return null;
@@ -74,10 +83,15 @@ export default function GenerateCodesPage() {
             const newCode = generateCode();
             const codeRef = doc(firestore, 'activationCodes', newCode);
             
-            // Using setDoc directly with await as setDocumentNonBlocking doesn't return a promise to await
+            const now = new Date();
+            const durationInMonths = parseInt(duration, 10);
+            const expiresAt = addMonths(now, durationInMonths);
+
             await setDoc(codeRef, {
                 id: newCode,
-                createdAt: serverTimestamp(),
+                createdAt: Timestamp.fromDate(now),
+                durationInMonths: durationInMonths,
+                expiresAt: Timestamp.fromDate(expiresAt),
                 isUsed: false,
                 usedBy: null,
                 usedAt: null,
@@ -95,15 +109,31 @@ export default function GenerateCodesPage() {
     return (
         <div className="space-y-6">
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl">
-                <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-bold text-white">Gerador de Códigos de Ativação</h2>
                         <p className="text-slate-400 text-sm">Crie e gerencie códigos de ativação para novos usuários.</p>
                     </div>
-                    <Button onClick={handleGenerateCode} disabled={isGenerating}>
-                        <KeySquare className="mr-2 h-4 w-4" />
-                        {isGenerating ? 'Gerando...' : 'Gerar Novo Código'}
-                    </Button>
+                    <div className="flex w-full sm:w-auto items-end gap-4">
+                        <div className="grid flex-1 sm:flex-initial sm:w-40 gap-1.5">
+                            <Label htmlFor="duration" className="text-slate-400">Duração</Label>
+                            <Select value={duration} onValueChange={setDuration}>
+                                <SelectTrigger id="duration" className="bg-slate-800 border-slate-700 rounded-xl h-11">
+                                    <SelectValue placeholder="Selecione..." />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-900 border-slate-700">
+                                    <SelectItem value="1">1 Mês</SelectItem>
+                                    <SelectItem value="3">3 Meses</SelectItem>
+                                    <SelectItem value="6">6 Meses</SelectItem>
+                                    <SelectItem value="12">12 Meses</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <Button onClick={handleGenerateCode} disabled={isGenerating} className="h-11">
+                            <KeySquare className="mr-2 h-4 w-4" />
+                            {isGenerating ? 'Gerando...' : 'Gerar'}
+                        </Button>
+                    </div>
                 </div>
                 <div>
                      <Table>
@@ -111,7 +141,9 @@ export default function GenerateCodesPage() {
                             <TableRow className="border-slate-800 hover:bg-transparent">
                                 <TableHead className="text-slate-400">Código</TableHead>
                                 <TableHead className="text-slate-400">Status</TableHead>
+                                <TableHead className="text-slate-400">Duração</TableHead>
                                 <TableHead className="text-slate-400">Criado em</TableHead>
+                                <TableHead className="text-slate-400">Expira em</TableHead>
                                 <TableHead className="text-slate-400">Usado por</TableHead>
                                 <TableHead className="text-slate-400">Usado em</TableHead>
                             </TableRow>
@@ -119,7 +151,7 @@ export default function GenerateCodesPage() {
                         <TableBody>
                             {isLoading && Array.from({length: 3}).map((_, i) => (
                                 <TableRow key={i} className="border-slate-800">
-                                    <TableCell colSpan={5} className="py-2">
+                                    <TableCell colSpan={7} className="py-2">
                                         <div className="h-8 animate-pulse rounded-md bg-slate-800" />
                                     </TableCell>
                                 </TableRow>
@@ -135,6 +167,11 @@ export default function GenerateCodesPage() {
                                                  <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
                                                  Utilizado
                                              </Badge>
+                                        ) : new Date() > code.expiresAt.toDate() ? (
+                                            <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/20 font-medium">
+                                                <ShieldX className="h-3.5 w-3.5 mr-1.5" />
+                                                Expirado
+                                            </Badge>
                                         ) : (
                                             <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/20">
                                                 <ShieldX className="h-3.5 w-3.5 mr-1.5" />
@@ -142,7 +179,9 @@ export default function GenerateCodesPage() {
                                             </Badge>
                                         )}
                                     </TableCell>
+                                    <TableCell className="text-slate-400">{code.durationInMonths} {code.durationInMonths > 1 ? 'meses' : 'mês'}</TableCell>
                                     <TableCell className="text-slate-400">{formatDate(code.createdAt)}</TableCell>
+                                    <TableCell className="text-slate-400">{formatDate(code.expiresAt)}</TableCell>
                                     <TableCell className="text-slate-400 font-mono text-xs">{code.usedBy || '-'}</TableCell>
                                     <TableCell className="text-slate-400">{formatDate(code.usedAt)}</TableCell>
                                 </TableRow>

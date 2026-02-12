@@ -313,6 +313,15 @@
           "type": "string",
           "format": "date-time"
         },
+        "durationInMonths": {
+            "type": "number",
+            "description": "The duration for which the code is valid, in months."
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp indicating when the code expires."
+        },
         "isUsed": {
           "type": "boolean"
         },
@@ -325,7 +334,7 @@
           "description": "UID of the user who used the code."
         }
       },
-      "required": ["id", "createdAt", "isUsed"]
+      "required": ["id", "createdAt", "isUsed", "durationInMonths", "expiresAt"]
     }
   },
   "auth": {

@@ -30,8 +30,16 @@ export function ActivationForm() {
 
         try {
             const codeSnap = await getDoc(codeRef);
-            if (!codeSnap.exists() || codeSnap.data()?.isUsed) {
+            const codeData = codeSnap.data();
+
+            if (!codeSnap.exists() || codeData?.isUsed) {
                 setError('Código de ativação inválido ou já utilizado.');
+                setIsLoading(false);
+                return;
+            }
+
+            if (codeData.expiresAt && codeData.expiresAt.toDate() < new Date()) {
+                setError('Este código de ativação expirou.');
                 setIsLoading(false);
                 return;
             }
