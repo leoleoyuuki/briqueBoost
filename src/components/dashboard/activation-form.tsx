@@ -1,19 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { useUser, useFirestore } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { useUser, useFirestore, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
 import { doc, getDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal, KeyRound } from "lucide-react";
+import { Terminal, KeyRound, LogOut, MessageCircle } from "lucide-react";
+import { Separator } from '@/components/ui/separator';
 
 
 export function ActivationForm() {
     const { user } = useUser();
     const firestore = useFirestore();
+    const auth = useAuth();
+    const router = useRouter();
     const { toast } = useToast();
     const [code, setCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -76,6 +81,13 @@ export function ActivationForm() {
             setIsLoading(false);
         }
     }
+    
+    const handleLogout = async () => {
+        await signOut(auth);
+        router.push('/');
+    };
+
+    const whatsappLink = "https://wa.me/5511957211546?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20um%20c%C3%B3digo%20de%20ativa%C3%A7%C3%A3o%20para%20o%20BriqueBoost.";
 
     return (
         <div className="flex flex-col items-center justify-center p-4 md:p-8 text-center bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl max-w-2xl mx-auto">
@@ -108,6 +120,21 @@ export function ActivationForm() {
                     {isLoading ? 'Ativando...' : 'Ativar Conta'}
                 </Button>
             </form>
+            
+            <Separator className="my-8 bg-slate-800 w-full max-w-sm" />
+
+            <div className="w-full max-w-sm space-y-3">
+                 <Button asChild variant="outline" className="w-full h-12 bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/20 text-emerald-400 hover:text-emerald-300">
+                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                        <MessageCircle className="mr-2 h-5 w-5" />
+                        Pedir código no WhatsApp
+                    </a>
+                </Button>
+                <Button onClick={handleLogout} variant="ghost" className="w-full h-12 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sair
+                </Button>
+            </div>
         </div>
     )
 }
