@@ -31,6 +31,8 @@ export async function createSubscriptionAction(input: CreateSubscriptionInput) {
 
     const idempotencyKey = randomUUID();
 
+    
+
     try {
         const response = await fetch('https://api.mercadopago.com/preapproval', {
             method: 'POST',
