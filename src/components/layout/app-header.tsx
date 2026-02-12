@@ -7,7 +7,7 @@ import { isThisMonth } from 'date-fns';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
-import { LogOut, User as UserIcon, Wand2 } from 'lucide-react';
+import { LogOut, User as UserIcon, Wand2, RotateCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -43,6 +43,13 @@ export function AppHeader() {
   const handleLogout = async () => {
     await signOut(auth);
     router.push('/');
+  };
+
+  const handleResetTour = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('briqueboost_tour_completed');
+        window.location.reload();
+    }
   };
 
   const aiLimit = 20;
@@ -111,7 +118,13 @@ export function AppHeader() {
                     </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-slate-800" />
-                    <DropdownMenuItem onClick={handleLogout} className="text-slate-300 focus:bg-slate-800 focus:text-white">
+                    {process.env.NODE_ENV === 'development' && (
+                        <DropdownMenuItem onClick={handleResetTour} className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer">
+                            <RotateCw className="mr-2 h-4 w-4" />
+                            <span>Resetar Tour</span>
+                        </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={handleLogout} className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sair</span>
                     </DropdownMenuItem>
