@@ -40,7 +40,7 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-      <SidebarMenu className="flex-1 px-2 space-y-1">
+      <SidebarMenu id="tour-sidebar-menu" className="flex-1 px-2 space-y-1">
         {menuItems.map((item) => (
           <SidebarMenuItem key={item.label}>
             <Link href={item.href}>
