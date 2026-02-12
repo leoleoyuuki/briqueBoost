@@ -51,6 +51,7 @@ export type UserProfile = {
   aiUsageLastReset: any; // Can be Timestamp
   accountStatus: 'pending' | 'active';
   activatedAt?: any; // Timestamp
+  expiresAt?: any; // Timestamp
   totalProfit?: number;
   totalRevenue?: number;
   totalInvestment?: number;
@@ -62,9 +63,6 @@ export type UserProfile = {
   itemsInStockUsedGood?: number;
   itemsInStockUsedFair?: number;
   itemsInStockForParts?: number;
-  subscriptionId?: string;
-  subscriptionStatus?: 'active' | 'paused' | 'cancelled' | 'expired' | 'none';
-  planId?: string;
 };
 
 export type MonthlySummary = {

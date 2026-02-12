@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser, useFirestore, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
-import { doc, getDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, writeBatch, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal, KeyRound, LogOut, MessageCircle } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
+import { addMonths } from 'date-fns';
 
 
 export function ActivationForm() {
@@ -49,6 +50,16 @@ export function ActivationForm() {
                 return;
             }
 
+            const durationInMonths = codeData.durationInMonths as number;
+            if (typeof durationInMonths !== 'number' || durationInMonths <= 0) {
+                setError('O código de ativação é inválido (duração não especificada).');
+                setIsLoading(false);
+                return;
+            }
+            
+            const now = new Date();
+            const expirationDate = addMonths(now, durationInMonths);
+
             // Code is valid and unused, perform batch write
             const batch = writeBatch(firestore);
 
@@ -60,7 +71,8 @@ export function ActivationForm() {
 
             batch.update(userRef, {
                 accountStatus: 'active',
-                activatedAt: serverTimestamp()
+                activatedAt: serverTimestamp(),
+                expiresAt: Timestamp.fromDate(expirationDate)
             });
 
             await batch.commit();

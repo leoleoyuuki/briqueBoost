@@ -3,11 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { doc } from 'firebase/firestore';
-import { isThisMonth } from 'date-fns';
+import { isThisMonth, differenceInDays } from 'date-fns';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
-import { LogOut, User as UserIcon, Wand2, RotateCw } from 'lucide-react';
+import { LogOut, User as UserIcon, Wand2, RotateCw, CalendarDays } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -59,6 +59,23 @@ export function AppHeader() {
       }
   }
   const usagePercentage = (aiUsage / aiLimit) * 100;
+
+  const expirationMessage = (() => {
+    if (!userProfile?.expiresAt) return null;
+    
+    const expirationDate = userProfile.expiresAt.toDate();
+    const now = new Date();
+
+    const remainingDays = differenceInDays(expirationDate, now);
+
+    if (remainingDays < 0) {
+        return "Acesso expirado";
+    }
+    if (remainingDays === 0) {
+        return "Acesso expira hoje";
+    }
+    return `Acesso por mais ${remainingDays} dia${remainingDays > 1 ? 's' : ''}`;
+  })();
 
 
   return (
@@ -115,7 +132,19 @@ export function AppHeader() {
                         </p>
                     </div>
                     </DropdownMenuLabel>
+
+                    {expirationMessage && (
+                        <>
+                            <DropdownMenuSeparator className="bg-slate-800" />
+                            <DropdownMenuItem disabled className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-default opacity-100">
+                                <CalendarDays className="mr-2 h-4 w-4" />
+                                <span>{expirationMessage}</span>
+                            </DropdownMenuItem>
+                        </>
+                    )}
+                    
                     <DropdownMenuSeparator className="bg-slate-800" />
+
                     {process.env.NODE_ENV === 'development' && (
                         <DropdownMenuItem onClick={handleResetWelcomeModal} className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer">
                             <RotateCw className="mr-2 h-4 w-4" />
