@@ -167,7 +167,7 @@ export default function GenerateCodesPage() {
                                                  <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
                                                  Utilizado
                                              </Badge>
-                                        ) : new Date() > code.expiresAt.toDate() ? (
+                                        ) : (code.expiresAt && new Date() > code.expiresAt.toDate()) ? (
                                             <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/20 font-medium">
                                                 <ShieldX className="h-3.5 w-3.5 mr-1.5" />
                                                 Expirado
