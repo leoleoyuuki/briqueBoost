@@ -130,7 +130,7 @@ export function InventoryTable({
             renderEmptyState()
         )}
          {isPaginated && items.length > 0 && (
-            <div id="inventory-tour-pagination" className="flex items-center justify-end space-x-2 py-4 px-4 border-t border-slate-800">
+            <div className="flex items-center justify-end space-x-2 py-4 px-4 border-t border-slate-800">
                 <Button
                     variant="outline"
                     size="sm"

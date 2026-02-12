@@ -7,7 +7,7 @@ import { isThisMonth } from 'date-fns';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
-import { LogOut, User as UserIcon, Wand2, RotateCw } from 'lucide-react';
+import { LogOut, User as UserIcon, Wand2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -45,16 +45,6 @@ export function AppHeader() {
     router.push('/');
   };
 
-  const handleResetTour = () => {
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem('briqueboost_tour_completed');
-        localStorage.removeItem('briqueboost_inventory_tour_completed');
-        localStorage.removeItem('briqueboost_wishlist_tour_completed');
-        localStorage.removeItem('briqueboost_support_tour_completed');
-        window.location.reload();
-    }
-  };
-
   const aiLimit = 20;
   let aiUsage = 0;
   if (userProfile) {
@@ -71,7 +61,7 @@ export function AppHeader() {
       className="sticky top-0 z-30 flex h-20 shrink-0 items-center gap-4 bg-slate-950/80 px-4 backdrop-blur-lg md:px-6"
     >
       <div>
-        <SidebarTrigger id="tour-sidebar-trigger" />
+        <SidebarTrigger />
       </div>
       <div className="w-full flex-1">
         {/* Search can be implemented later */}
@@ -121,12 +111,6 @@ export function AppHeader() {
                     </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-slate-800" />
-                    {process.env.NODE_ENV === 'development' && (
-                        <DropdownMenuItem onClick={handleResetTour} className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer">
-                            <RotateCw className="mr-2 h-4 w-4" />
-                            <span>Resetar Tour</span>
-                        </DropdownMenuItem>
-                    )}
                     <DropdownMenuItem onClick={handleLogout} className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sair</span>

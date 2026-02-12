@@ -27,7 +27,6 @@ import {
 import { subMonths, format } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InfoCarouselCard } from '@/components/dashboard/info-carousel-card';
-import { DashboardTour } from '@/components/dashboard/dashboard-tour';
 
 function ChangeIndicator({ change, isPositive }: { change: number, isPositive: boolean }) {
     if (change === 0) {
@@ -216,7 +215,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div id="tour-stats-cards" className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
+                <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
                     <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
                                   rounded-3xl p-4 md:p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
@@ -332,7 +331,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                    <div id="tour-performance-chart" className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+                    <div className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
                         <div className="p-4 md:p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
                                 <h3 className="text-xl font-bold mb-1">Análise de Performance</h3>
@@ -372,7 +371,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div id="tour-recent-items-table" className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
                     
                     <div className="p-4 md:p-6 border-b border-slate-800">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -391,12 +390,12 @@ export default function DashboardPage() {
                                     Exportar
                                 </button>
                                 <Link href="/inventory/new">
-                                    <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
+                                    <div className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
                                                     text-white rounded-xl transition-all duration-200 
-                                                    flex items-center gap-2 font-medium text-sm">
+                                                    flex items-center gap-2 font-medium text-sm cursor-pointer">
                                         <Plus className="w-4 h-4" />
                                         Adicionar Item
-                                    </button>
+                                    </div>
                                 </Link>
                             </div>
                         </div>
@@ -411,7 +410,6 @@ export default function DashboardPage() {
                 </div>
 
             </div>
-            <DashboardTour />
         </div>
     );
 }

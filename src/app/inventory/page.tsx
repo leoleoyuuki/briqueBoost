@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Plus, Download } from 'lucide-react';
-import { InventoryTour } from '@/components/inventory/inventory-tour';
 
 const PAGE_SIZE = 10;
 
@@ -84,7 +83,7 @@ export default function InventoryPage() {
     return (
         <div className="space-y-6">
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
-                <div id="inventory-tour-header" className="p-6 border-b border-slate-800">
+                <div className="p-6 border-b border-slate-800">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div>
                             <h2 className="text-2xl font-bold mb-1 text-white">Inventário Completo</h2>
@@ -94,14 +93,14 @@ export default function InventoryPage() {
                         </div>
                         
                         <div className="flex items-center gap-3">
-                            <button id="inventory-tour-export" className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 
+                            <button className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 
                                                 text-white rounded-xl transition-all duration-200 
                                                 flex items-center gap-2 font-medium text-sm">
                                 <Download className="w-4 h-4" />
                                 Exportar
                             </button>
                             <Link href="/inventory/new">
-                                <button id="inventory-tour-add" className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
+                                <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 
                                                     text-white rounded-xl transition-all duration-200 
                                                     flex items-center gap-2 font-medium text-sm">
                                     <Plus className="w-4 h-4" />
@@ -112,7 +111,7 @@ export default function InventoryPage() {
                     </div>
                 </div>
                 
-                <div id="inventory-tour-table" className="overflow-hidden">
+                <div className="overflow-hidden">
                     <InventoryTable 
                         items={items ?? []} 
                         isLoading={areItemsLoading}
@@ -124,7 +123,6 @@ export default function InventoryPage() {
                     />
                 </div>
             </div>
-            <InventoryTour />
         </div>
     );
 }
