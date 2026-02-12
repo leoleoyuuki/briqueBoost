@@ -7,10 +7,11 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ActivationForm } from '@/components/dashboard/activation-form';
 import type { UserProfile } from '@/lib/types';
+import { WelcomeModal } from '@/components/dashboard/welcome-modal';
 
 export default function DashboardLayout({
   children,
@@ -21,11 +22,28 @@ export default function DashboardLayout({
   const router = useRouter();
   const firestore = useFirestore();
 
+  // State for the welcome modal
+  const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
+
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.replace('/');
     }
   }, [user, isUserLoading, router]);
+
+  // Effect to check if welcome modal should be shown
+  useEffect(() => {
+    // Only run on the client-side after hydration
+    const hasSeenModal = localStorage.getItem('briqueboost_welcome_modal_seen');
+    if (!hasSeenModal) {
+      setWelcomeModalOpen(true);
+    }
+  }, []);
+
+  const handleCloseWelcomeModal = () => {
+    setWelcomeModalOpen(false);
+    localStorage.setItem('briqueboost_welcome_modal_seen', 'true');
+  };
 
   const userProfileRef = useMemoFirebase(() => {
     if (!user) return null;
@@ -66,6 +84,8 @@ export default function DashboardLayout({
         <main className="flex-1">
           {children}
         </main>
+        {/* Render the modal */}
+        <WelcomeModal isOpen={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} />
       </div>
     </SidebarProvider>
   );
