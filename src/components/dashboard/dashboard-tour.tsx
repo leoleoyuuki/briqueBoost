@@ -26,9 +26,9 @@ const TOUR_STEPS: Step[] = [
         placement: 'top',
     },
     {
-        target: '#tour-sidebar-menu',
+        target: '#tour-sidebar-trigger',
         content: 'Use o menu para navegar por outras seções como Inventário e Lista de Desejos. O tour termina aqui. Bons negócios!',
-        placement: 'right',
+        placement: 'bottom',
     },
 ];
 

@@ -48,6 +48,9 @@ export function AppHeader() {
   const handleResetTour = () => {
     if (typeof window !== 'undefined') {
         localStorage.removeItem('briqueboost_tour_completed');
+        localStorage.removeItem('briqueboost_inventory_tour_completed');
+        localStorage.removeItem('briqueboost_wishlist_tour_completed');
+        localStorage.removeItem('briqueboost_support_tour_completed');
         window.location.reload();
     }
   };
@@ -68,7 +71,7 @@ export function AppHeader() {
       className="sticky top-0 z-30 flex h-20 shrink-0 items-center gap-4 bg-slate-950/80 px-4 backdrop-blur-lg md:px-6"
     >
       <div>
-        <SidebarTrigger />
+        <SidebarTrigger id="tour-sidebar-trigger" />
       </div>
       <div className="w-full flex-1">
         {/* Search can be implemented later */}
