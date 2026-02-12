@@ -215,9 +215,9 @@ export default function App() {
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-2">Plano Pro Individual</h3>
                     <p className="text-slate-400 mb-6">Acesso completo a todas as ferramentas para você decolar.</p>
-                    <div className="flex items-baseline gap-1 mb-8">
+                    <div className="flex items-baseline justify-center gap-2 mb-8">
                         <span className="text-4xl font-bold text-white">R$ 29,90</span>
-                        <span className="text-sm text-slate-500">/mês</span>
+                        <span className="text-xl font-medium text-slate-400">x 12</span>
                     </div>
                     <a href={individualPlanLink} target="_blank" rel="noopener noreferrer" className="w-full">
                         <button className="w-full py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-500 transition-all">
