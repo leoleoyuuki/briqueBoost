@@ -163,7 +163,8 @@ service cloud.firestore {
         return request.auth.uid == 'nccUQWtsTsRmnFXPn3HnMZ4R9ch1';
       }
 
-      allow get, list: if isAdmin();
+      allow get: if isSignedIn();
+      allow list: if isAdmin();
       allow create: if isAdmin() && request.resource.data.id == codeId;
       
       // Allow a user to claim an unused code
