@@ -6,7 +6,7 @@ import Joyride, { type Step, CallBackProps, STATUS } from 'react-joyride';
 const TOUR_STEPS: Step[] = [
     {
         target: 'body',
-        content: 'Bem-vindo ao BriqueBoost! Vamos fazer um tour rápido pelas principais funcionalidades.',
+        content: 'Bem-vindo ao BriqueBoost! Vamos fazer um tour rápido pelo dashboard.',
         placement: 'center',
         disableBeacon: true,
     },
@@ -22,22 +22,12 @@ const TOUR_STEPS: Step[] = [
     },
     {
         target: '#tour-recent-items-table',
-        content: 'Seus itens adicionados mais recentemente aparecerão aqui. Você pode ver detalhes ou adicionar um novo item clicando nos botões.',
+        content: 'Seus itens adicionados mais recentemente aparecerão aqui. Você pode ver detalhes ou adicionar um novo item clicando no botão "Adicionar Item".',
         placement: 'top',
     },
     {
-        target: '#tour-add-item-button',
-        content: 'Clique aqui para adicionar um novo item ao seu inventário. É o primeiro passo para começar a vender!',
-        placement: 'top',
-    },
-    {
-        target: '#tour-wishlist-link',
-        content: 'Na Lista de Desejos, você pode anotar os produtos que seus clientes estão procurando. Uma ótima forma de não perder futuras vendas!',
-        placement: 'right',
-    },
-    {
-        target: '#tour-support-link',
-        content: 'E se precisar de ajuda ou de uma apresentação guiada da plataforma, a página de Suporte tem nosso contato direto.',
+        target: '#tour-sidebar-menu',
+        content: 'Use o menu para navegar por outras seções como Inventário e Lista de Desejos. O tour termina aqui. Bons negócios!',
         placement: 'right',
     },
 ];

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { LifeBuoy, MessageSquare, Calendar, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { SupportTour } from "@/components/support/support-tour";
 
 export default function SupportPage() {
 
@@ -13,7 +14,7 @@ export default function SupportPage() {
 
     return (
         <div className="flex justify-center items-start pt-10">
-            <Card className="w-full max-w-2xl bg-slate-900/50 backdrop-blur-xl border-slate-800 rounded-3xl">
+            <Card id="support-tour-card" className="w-full max-w-2xl bg-slate-900/50 backdrop-blur-xl border-slate-800 rounded-3xl">
                 <CardHeader className="text-center items-center">
                     <div className="bg-blue-500/10 p-4 rounded-full mb-4">
                         <LifeBuoy className="h-10 w-10 text-blue-400" />
@@ -33,13 +34,13 @@ export default function SupportPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col sm:flex-row gap-4 pt-6">
-                    <Button asChild className="w-full h-14 text-base bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 hover:text-emerald-300">
+                    <Button id="support-tour-whatsapp" asChild className="w-full h-14 text-base bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 hover:text-emerald-300">
                         <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
                             <MessageSquare className="mr-2 h-5 w-5" />
                             Enviar Mensagem
                         </a>
                     </Button>
-                    <Button asChild className="w-full h-14 text-base bg-blue-600 hover:bg-blue-500">
+                    <Button id="support-tour-calendly" asChild className="w-full h-14 text-base bg-blue-600 hover:bg-blue-500">
                         <a href={calendlyLink} target="_blank" rel="noopener noreferrer">
                             <Calendar className="mr-2 h-5 w-5" />
                             Agendar Onboarding
@@ -47,6 +48,7 @@ export default function SupportPage() {
                     </Button>
                 </CardFooter>
             </Card>
+            <SupportTour />
         </div>
     );
 }

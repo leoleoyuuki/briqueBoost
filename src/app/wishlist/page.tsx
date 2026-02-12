@@ -8,6 +8,7 @@ import { WishlistTable } from '@/components/wishlist/wishlist-table';
 import { AddWishlistItemDialog } from '@/components/wishlist/wishlist-form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
+import { WishlistTour } from '@/components/wishlist/wishlist-tour';
 
 export default function WishlistPage() {
     const router = useRouter();
@@ -42,7 +43,7 @@ export default function WishlistPage() {
     return (
         <div className="space-y-6">
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
-                <div className="p-6 border-b border-slate-800">
+                <div id="wishlist-tour-header" className="p-6 border-b border-slate-800">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div>
                             <h2 className="text-2xl font-bold mb-1 text-white">Lista de Desejos</h2>
@@ -51,19 +52,20 @@ export default function WishlistPage() {
                             </p>
                         </div>
                         
-                        <div className="flex items-center gap-3">
+                        <div id="wishlist-tour-add" className="flex items-center gap-3">
                             <AddWishlistItemDialog items={wishlistItems ?? []} isLoading={areItemsLoading} />
                         </div>
                     </div>
                 </div>
                 
-                <div className="overflow-hidden">
+                <div id="wishlist-tour-table" className="overflow-hidden">
                     <WishlistTable
                         items={wishlistItems ?? []} 
                         isLoading={areItemsLoading}
                     />
                 </div>
             </div>
+            <WishlistTour />
         </div>
     );
 }
