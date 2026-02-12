@@ -7,7 +7,7 @@ import { isThisMonth } from 'date-fns';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
-import { LogOut, User as UserIcon, Wand2 } from 'lucide-react';
+import { LogOut, User as UserIcon, Wand2, RotateCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -43,6 +43,11 @@ export function AppHeader() {
   const handleLogout = async () => {
     await signOut(auth);
     router.push('/');
+  };
+
+  const handleResetWelcomeModal = () => {
+    localStorage.removeItem('briqueboost_welcome_modal_seen');
+    window.location.reload();
   };
 
   const aiLimit = 20;
@@ -101,7 +106,7 @@ export function AppHeader() {
                         </Avatar>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-slate-900 border-slate-800" align="end" forceMount>
+                <DropdownMenuContent className="w-64 bg-slate-900 border-slate-800" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none text-white">{user.displayName}</p>
@@ -111,6 +116,12 @@ export function AppHeader() {
                     </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-slate-800" />
+                    {process.env.NODE_ENV === 'development' && (
+                        <DropdownMenuItem onClick={handleResetWelcomeModal} className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer">
+                            <RotateCw className="mr-2 h-4 w-4" />
+                            <span>Resetar Modal de Boas-Vindas</span>
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={handleLogout} className="text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sair</span>
