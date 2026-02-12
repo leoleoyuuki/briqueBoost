@@ -59,6 +59,10 @@ service cloud.firestore {
      * Enforces that a specific field is immutable and cannot be changed during an update.
      */
     function isImmutable(field) {
+      // Allow the field to be set on creation
+      if (resource == null) {
+        return true;
+      }
       return request.resource.data[field] == resource.data[field];
     }
 
@@ -103,7 +107,14 @@ service cloud.firestore {
       allow get: if isOwner(userId);
       allow list: if false; // Security: Prevent user enumeration.
       allow create: if isOwner(userId) && hasValidUserData(userId);
-      allow update: if isExistingOwner(userId) && isImmutable('id');
+      // Allow updates if the user is the owner, core fields are immutable, and status isn't being maliciously changed.
+      // This rule permits changing name, counters, and activation fields like `expiresAt`.
+      allow update: if isOwner(userId)
+                    && isImmutable('id')
+                    && isImmutable('email')
+                    && isImmutable('createdAt')
+                    // Prevent a user from deactivating their own account.
+                    && request.resource.data.accountStatus == 'active';
       allow delete: if isExistingOwner(userId);
 
       /**
