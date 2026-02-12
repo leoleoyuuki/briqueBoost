@@ -9,7 +9,6 @@ import { InventoryTable } from '@/components/dashboard/inventory-table';
 import { ProfitChart } from '@/components/dashboard/profit-chart';
 import { ItemSummary } from '@/components/dashboard/item-summary';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useRouter } from 'next/navigation';
 import { 
     TrendingUp, 
     Package, 
@@ -28,7 +27,6 @@ import {
 import { subMonths, format } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InfoCarouselCard } from '@/components/dashboard/info-carousel-card';
-import { ActivationForm } from '@/components/dashboard/activation-form';
 
 function ChangeIndicator({ change, isPositive }: { change: number, isPositive: boolean }) {
     if (change === 0) {
@@ -63,16 +61,9 @@ function ChangeIndicator({ change, isPositive }: { change: number, isPositive: b
 
 
 export default function DashboardPage() {
-    const router = useRouter();
-    const { user, isUserLoading } = useUser();
+    const { user } = useUser();
     const firestore = useFirestore();
     const [chartView, setChartView] = useState<'profit' | 'revenue'>('profit');
-
-    useEffect(() => {
-        if (!isUserLoading && !user) {
-            router.push('/');
-        }
-    }, [isUserLoading, user, router]);
 
     const userProfileRef = useMemoFirebase(() => {
         if (!user) return null;
@@ -186,35 +177,6 @@ export default function DashboardPage() {
         }
     }, [userProfile]);
 
-    const isLoading = isUserLoading || isProfileLoading;
-
-    if (isLoading || !user) {
-        return (
-            <div className="min-h-screen bg-slate-950 p-4 md:p-8">
-                <div className="max-w-[1800px] mx-auto space-y-6">
-                    <Skeleton className="h-24 bg-slate-900 rounded-3xl" />
-                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Skeleton key={i} className="h-48 bg-slate-900 rounded-3xl" />
-                        ))}
-                    </div>
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                        <Skeleton className="xl:col-span-2 h-[450px] bg-slate-900 rounded-3xl" />
-                        <Skeleton className="h-[450px] bg-slate-900 rounded-3xl" />
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (userProfile?.accountStatus === 'pending') {
-        return (
-             <div className="min-h-screen bg-slate-950 p-4 md:p-8 flex items-center justify-center">
-                <ActivationForm />
-            </div>
-        )
-    }
-
     const currentDate = new Date().toLocaleDateString('pt-BR', { 
         weekday: 'long', 
         day: 'numeric', 
@@ -231,7 +193,7 @@ export default function DashboardPage() {
                             {currentDate}
                         </p>
                         <h1 className="text-4xl lg:text-5xl font-bold mb-2">
-                            Olá, {user.displayName || 'Revendedor'}! 👋
+                            Olá, {user?.displayName || 'Revendedor'}! 👋
                         </h1>
                         <p className="text-slate-400 text-lg">
                             Veja o que está acontecendo na sua loja este mês.
