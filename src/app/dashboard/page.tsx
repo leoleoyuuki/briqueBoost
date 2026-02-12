@@ -28,6 +28,7 @@ import {
 import { subMonths, format } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InfoCarouselCard } from '@/components/dashboard/info-carousel-card';
+import { ActivationForm } from '@/components/dashboard/activation-form';
 
 function ChangeIndicator({ change, isPositive }: { change: number, isPositive: boolean }) {
     if (change === 0) {
@@ -204,6 +205,14 @@ export default function DashboardPage() {
                 </div>
             </div>
         );
+    }
+
+    if (userProfile?.accountStatus === 'pending') {
+        return (
+             <div className="min-h-screen bg-slate-950 p-4 md:p-8 flex items-center justify-center">
+                <ActivationForm />
+            </div>
+        )
     }
 
     const currentDate = new Date().toLocaleDateString('pt-BR', { 

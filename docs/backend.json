@@ -77,6 +77,7 @@
           "type": "number",
           "description": "Count of items in stock with 'For Parts' condition."
         },
+<<<<<<< HEAD
         "subscriptionId": {
           "type": "string",
           "description": "The ID of the user's subscription in Mercado Pago."
@@ -89,13 +90,25 @@
         "planId": {
           "type": "string",
           "description": "The ID of the subscription plan the user is subscribed to."
+=======
+        "accountStatus": {
+          "type": "string",
+          "description": "The activation status of the user's account.",
+          "enum": ["pending", "active"]
+        },
+        "activatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was activated.",
+          "format": "date-time"
+>>>>>>> c7a5431 (vamos esquecer por enquanto o mercado pago, adicione ativação de conta p)
         }
       },
       "required": [
         "id",
         "email",
         "name",
-        "createdAt"
+        "createdAt",
+        "accountStatus"
       ]
     },
     "Item": {
@@ -285,6 +298,34 @@
         "totalProfit",
         "totalItemsSold"
       ]
+    },
+    "ActivationCode": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Activation Code",
+      "type": "object",
+      "description": "Represents an activation code for user accounts.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique activation code string."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "isUsed": {
+          "type": "boolean"
+        },
+        "usedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "usedBy": {
+          "type": "string",
+          "description": "UID of the user who used the code."
+        }
+      },
+      "required": ["id", "createdAt", "isUsed"]
     }
   },
   "auth": {
@@ -367,6 +408,22 @@
             {
               "name": "wishlistItemId",
               "description": "The unique identifier for the wishlist item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/activationCodes/{codeId}",
+        "definition": {
+          "entityName": "ActivationCode",
+          "schema": {
+            "$ref": "#/backend/entities/ActivationCode"
+          },
+          "description": "Stores activation codes for user accounts.",
+          "params": [
+            {
+              "name": "codeId",
+              "description": "The unique activation code."
             }
           ]
         }

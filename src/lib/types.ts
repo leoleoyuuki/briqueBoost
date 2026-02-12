@@ -31,6 +31,14 @@ export type WishlistItem = {
   createdAt: any; // Can be Timestamp from Firebase
 };
 
+export type ActivationCode = {
+    id: string;
+    createdAt: any; // Timestamp
+    isUsed: boolean;
+    usedAt?: any; // Timestamp
+    usedBy?: string; // user UID
+}
+
 // Represents the user profile document stored in Firestore
 export type UserProfile = {
   id: string;
@@ -39,6 +47,8 @@ export type UserProfile = {
   createdAt: any; // Can be Timestamp from Firebase
   aiUsageCount: number;
   aiUsageLastReset: any; // Can be Timestamp
+  accountStatus: 'pending' | 'active';
+  activatedAt?: any; // Timestamp
   totalProfit?: number;
   totalRevenue?: number;
   totalInvestment?: number;

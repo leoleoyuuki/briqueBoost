@@ -58,6 +58,7 @@ export function SignupForm() {
             createdAt: serverTimestamp(),
             aiUsageCount: 0,
             aiUsageLastReset: serverTimestamp(),
+            accountStatus: 'pending',
         });
         
         router.push('/dashboard');
