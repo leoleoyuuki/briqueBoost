@@ -107,22 +107,6 @@ export default function App() {
                 Ver funcionalidades
               </Link>
             </div>
-            
-            <div className="mt-12 flex flex-col items-center gap-4">
-              <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-slate-950 bg-slate-800 overflow-hidden">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+20}`} alt="User" />
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex text-yellow-400">
-                  {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
-                </div>
-                <span className="text-sm font-bold text-slate-300">4.9/5 de 200+ revendedores reais</span>
-              </div>
-            </div>
           </div>
 
           <div className="relative max-w-5xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-4 gap-4">
