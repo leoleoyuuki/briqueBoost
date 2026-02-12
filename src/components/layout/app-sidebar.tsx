@@ -42,7 +42,7 @@ export function AppSidebar() {
 
       <SidebarMenu id="tour-sidebar-menu" className="flex-1 px-2 space-y-1">
         {menuItems.map((item) => (
-          <SidebarMenuItem key={item.label}>
+          <SidebarMenuItem key={item.label} id={(item as any).tourId}>
             <Link href={item.href}>
               <SidebarMenuButton
                 isActive={isActive(item.href)}

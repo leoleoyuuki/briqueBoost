@@ -31,8 +31,13 @@ const TOUR_STEPS: Step[] = [
         placement: 'top',
     },
     {
-        target: '#tour-sidebar-menu',
-        content: 'Use o menu lateral para navegar entre as seções: Inventário completo, Lista de Desejos dos clientes e Suporte.',
+        target: '#tour-wishlist-link',
+        content: 'Na Lista de Desejos, você pode anotar os produtos que seus clientes estão procurando. Uma ótima forma de não perder futuras vendas!',
+        placement: 'right',
+    },
+    {
+        target: '#tour-support-link',
+        content: 'E se precisar de ajuda ou de uma apresentação guiada da plataforma, a página de Suporte tem nosso contato direto.',
         placement: 'right',
     },
 ];
