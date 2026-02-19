@@ -71,15 +71,35 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hidden sm:block font-bold text-slate-300 hover:text-blue-400 transition-colors">Login</Link>
-            <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded-full font-bold hover:bg-blue-500 transition-all shadow-lg hover:shadow-blue-500/20">
+            <Link href="/login" className="hidden md:block font-bold text-slate-300 hover:text-blue-400 transition-colors">Login</Link>
+            <Link href="/signup" className="hidden md:flex bg-blue-600 text-white px-6 py-3 rounded-full font-bold hover:bg-blue-500 transition-all shadow-lg hover:shadow-blue-500/20 items-center justify-center">
               Criar Conta
             </Link>
-            <button className="md:hidden text-slate-300" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden text-slate-300 z-50" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
         </div>
+        
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+            <div 
+                className="md:hidden fixed inset-0 top-0 pt-24 pb-8 bg-slate-950/95 backdrop-blur-lg z-40"
+                onClick={() => setMobileMenuOpen(false)}
+            >
+                <div className="container mx-auto px-6 flex flex-col items-center gap-8">
+                    <a href="#" onClick={() => setMobileMenuOpen(false)} className="text-lg hover:text-blue-400 transition-colors font-medium">Início</a>
+                    <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-lg hover:text-blue-400 transition-colors font-medium">Funcionalidades</a>
+                    <a href="#planos" onClick={() => setMobileMenuOpen(false)} className="text-lg hover:text-blue-400 transition-colors font-medium">Planos</a>
+                    <a href="#sobre" onClick={() => setMobileMenuOpen(false)} className="text-lg hover:text-blue-400 transition-colors font-medium">Sobre</a>
+                    <div className="h-px w-full bg-slate-800 my-2"></div>
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-lg font-bold text-slate-300 hover:text-blue-400 transition-colors">Login</Link>
+                    <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="w-full max-w-xs text-center bg-blue-600 text-white px-6 py-4 rounded-full font-bold hover:bg-blue-500 transition-all">
+                        Criar Conta
+                    </Link>
+                </div>
+            </div>
+        )}
       </nav>
 
       {/* Hero Section */}
