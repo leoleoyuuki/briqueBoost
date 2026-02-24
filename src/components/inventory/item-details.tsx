@@ -63,7 +63,7 @@ const conditionTranslations: { [key: string]: string } = {
     "New": "Novo",
     "Used - Like New": "Usado - Como Novo",
     "Used - Good": "Usado - Bom",
-    "Used - Fair": "Usado - Razoável",
+    "Used - Fair": "Razoável",
     "For Parts": "Para Peças"
 };
 
@@ -105,6 +105,7 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
         itemsInStock: increment(-1),
         totalItemsSold: increment(1),
         totalProfit: increment(profit),
+        totalInvestment: increment(-item.purchasePrice),
         totalInvestmentSold: increment(item.purchasePrice),
         totalRevenue: increment(price),
       };
@@ -264,6 +265,7 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
             totalProfit: increment(-profit),
             totalRevenue: increment(-salePrice),
             totalInvestmentSold: increment(-item.purchasePrice),
+            totalInvestment: increment(item.purchasePrice),
             itemsInStock: increment(1),
         };
         if (conditionField) {
