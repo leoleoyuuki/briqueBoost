@@ -31,7 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Dot, ImageIcon, Trash2 } from 'lucide-react';
+import { Pencil, Dot, ImageIcon, Trash2, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 
 const formatCurrency = (value: number | null | undefined) => {
@@ -75,7 +75,8 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
   const [salePrice, setSalePrice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+  const [isReverting, setIsReverting] = useState(false);
+
   const handleConfirmSale = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!user || !salePrice) return;
@@ -228,6 +229,80 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
     }
   };
 
+  const handleRevertToInStock = async () => {
+    if (!user || item.status !== 'Sold' || !item.salePrice || !item.saleDate) {
+        toast({
+            variant: 'destructive',
+            title: 'Ação Inválida',
+            description: 'Este item não pode ser revertido para "Em Estoque" pois faltam dados da venda.',
+        });
+        return;
+    }
+
+    setIsReverting(true);
+
+    const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
+    const userRef = doc(firestore, 'users', user.uid);
+    const batch = writeBatch(firestore);
+
+    const profit = item.profit || 0;
+    const salePrice = item.salePrice;
+
+    try {
+        // 1. Update the item document
+        batch.update(itemRef, {
+            status: 'In Stock',
+            salePrice: null,
+            saleDate: null,
+            profit: null,
+        });
+
+        // 2. Update user profile totals
+        const conditionField = getConditionStockField(item.condition);
+        const userUpdate: { [key: string]: any } = {
+            totalItemsSold: increment(-1),
+            totalProfit: increment(-profit),
+            totalRevenue: increment(-salePrice),
+            totalInvestmentSold: increment(-item.purchasePrice),
+            itemsInStock: increment(1),
+        };
+        if (conditionField) {
+            userUpdate[conditionField] = increment(1);
+        }
+        batch.update(userRef, userUpdate);
+
+        // 3. Update monthly summary
+        if (item.saleDate?.toDate) {
+            const saleDate = item.saleDate.toDate();
+            const saleMonthId = format(saleDate, 'yyyy-MM');
+            const summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', saleMonthId);
+            
+            batch.update(summaryRef, {
+                totalItemsSold: increment(-1),
+                totalProfit: increment(-profit),
+                totalRevenue: increment(-salePrice),
+                totalInvestmentSold: increment(-item.purchasePrice),
+            });
+        }
+
+        await batch.commit();
+        toast({
+            title: 'Item Revertido!',
+            description: `${item.name} foi movido de volta para "Em Estoque".`,
+        });
+    } catch (error) {
+        console.error("Error reverting sale:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Erro ao reverter venda',
+            description: 'Não foi possível reverter o status do item. Tente novamente.',
+        });
+    } finally {
+        setIsReverting(false);
+    }
+  };
+
+
   const profit = item.status === 'Sold' && item.salePrice ? item.salePrice - item.purchasePrice : null;
 
   return (
@@ -349,6 +424,38 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
                     </Button>
                 </div>
             </form>
+        )}
+        {item.status === 'Sold' && (
+            <div className="bg-slate-900 p-6 border-t border-slate-800 space-y-4">
+                <div>
+                    <h3 className="font-semibold text-white">Reverter Venda</h3>
+                    <p className="text-sm text-slate-400 mt-1">
+                      Marcou este item como vendido por engano? Reverta a ação para retorná-lo ao estoque.
+                    </p>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" disabled={isReverting} className="bg-slate-800 hover:bg-slate-700 border-slate-700 text-white rounded-xl h-11 px-6">
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      Mudar para 'Em Estoque'
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-slate-900 border-slate-800">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Reverter para 'Em Estoque'?</AlertDialogTitle>
+                      <AlertDialogDescription className="text-slate-400">
+                        Esta ação reverterá as estatísticas de venda (lucro, receita) associadas a este item e o colocará de volta no seu inventário ativo. Seus relatórios financeiros serão ajustados.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleRevertToInStock} disabled={isReverting} className="bg-blue-600 hover:bg-blue-500">
+                        {isReverting ? 'Revertendo...' : 'Sim, Reverter'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+            </div>
         )}
     </div>
   );
