@@ -31,6 +31,15 @@ export type WishlistItem = {
   createdAt: any; // Can be Timestamp from Firebase
 };
 
+export type OtherCost = {
+  id: string;
+  userId: string;
+  description: string;
+  amount: number;
+  date: any; // Can be Timestamp from Firebase
+  category: 'Transporte' | 'Pedágio' | 'Alimentação' | 'Embalagem' | 'Outros';
+};
+
 export type ActivationCode = {
     id: string;
     createdAt: any; // Timestamp
@@ -57,6 +66,7 @@ export type UserProfile = {
   totalItemsSold?: number;
   itemsInStock?: number;
   totalInvestmentSold?: number;
+  totalOtherCosts?: number;
   itemsInStockNew?: number;
   itemsInStockUsedLikeNew?: number;
   itemsInStockUsedGood?: number;
@@ -73,6 +83,7 @@ export type MonthlySummary = {
   totalRevenue?: number;
   totalInvestment?: number;
   totalInvestmentSold?: number;
+  totalOtherCosts?: number;
 }
 
 // Represents the mock user data structure, not used with live data.
@@ -81,3 +92,5 @@ export type User = {
   email: string;
   avatarUrl?: string;
 };
+
+    

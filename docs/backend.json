@@ -35,7 +35,7 @@
         },
         "totalProfit": {
             "type": "number",
-            "description": "The total profit from all sold items."
+            "description": "The total net profit, calculated from sales minus purchase prices and other costs."
         },
         "totalRevenue": {
             "type": "number",
@@ -56,6 +56,10 @@
         "totalInvestmentSold": {
             "type": "number",
             "description": "The total purchase price of all sold items."
+        },
+        "totalOtherCosts": {
+            "type": "number",
+            "description": "The total of other miscellaneous costs."
         },
         "itemsInStockNew": {
           "type": "number",
@@ -261,7 +265,7 @@
         },
         "totalProfit": {
           "type": "number",
-          "description": "Total profit for the month."
+          "description": "Total net profit for the month."
         },
         "totalItemsSold": {
           "type": "number",
@@ -278,6 +282,10 @@
         "totalInvestmentSold": {
             "type": "number",
             "description": "Total purchase price of items sold this month."
+        },
+        "totalOtherCosts": {
+            "type": "number",
+            "description": "Total other costs for the month."
         }
       },
       "required": [
@@ -322,6 +330,48 @@
         }
       },
       "required": ["id", "createdAt", "isUsed", "durationInMonths"]
+    },
+    "OtherCost": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Other Cost",
+      "type": "object",
+      "description": "Represents other costs associated with acquiring items, such as transport, tolls, etc.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the cost."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who incurred this cost."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the cost."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of the cost."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date the cost was incurred.",
+          "format": "date-time"
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the cost.",
+          "enum": ["Transporte", "Pedágio", "Alimentação", "Embalagem", "Outros"]
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "description",
+        "amount",
+        "date",
+        "category"
+      ]
     }
   },
   "auth": {
@@ -423,8 +473,30 @@
             }
           ]
         }
+      },
+      {
+        "path": "/users/{userId}/otherCosts/{costId}",
+        "definition": {
+          "entityName": "OtherCost",
+          "schema": {
+            "$ref": "#/backend/entities/OtherCost"
+          },
+          "description": "Stores other costs incurred by a user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "costId",
+              "description": "The unique identifier for the cost."
+            }
+          ]
+        }
       }
     ],
     "reasoning": "The Firestore structure is simplified to use a denormalized 'items' collection under each user's private path. This aligns with the application's component structure and simplifies data fetching by avoiding client-side joins. The primary collections are `/users/{userId}` for user profiles and `/users/{userId}/items/{itemId}` for all item-related data, including listing and sale information. This path-based ownership model is secure and allows for straightforward security rules that enforce user data isolation effectively."
   }
 }
+
+    

@@ -97,6 +97,14 @@ service cloud.firestore {
       return request.resource.data.userId == userId && request.resource.data.id == wishlistItemId;
     }
     
+    /**
+     * On create, validates that the OtherCost document's internal 'userId' and 'id' fields
+     * match the IDs in the document's path.
+     */
+    function hasValidOtherCostData(userId, costId) {
+      return request.resource.data.userId == userId && request.resource.data.id == costId;
+    }
+
     // ----------------------------------------------------------------------
     // Collection Rules
     // ----------------------------------------------------------------------
@@ -164,6 +172,20 @@ service cloud.firestore {
         allow create, update: if isOwner(userId);
         allow delete: if false;
       }
+      
+      /**
+       * @description Manages other costs for a user.
+       * @path /users/{userId}/otherCosts/{costId}
+       * @allow (create) User 'user_abc' creates a new cost record.
+       * @allow (list) User 'user_abc' lists all of their own costs.
+       * @deny (get) User 'user_xyz' attempts to read another user's costs.
+       * @principle Enforces strict data ownership for private user expenses.
+       */
+      match /otherCosts/{costId} {
+        allow get, list, delete: if isOwner(userId);
+        allow create: if isOwner(userId) && hasValidOtherCostData(userId, costId);
+        allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
+      }
     }
     
     /**
@@ -190,3 +212,5 @@ service cloud.firestore {
     }
   }
 }
+
+    
