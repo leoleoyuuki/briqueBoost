@@ -122,11 +122,13 @@ export default function DashboardPage() {
             ? (prevMonthData?.totalProfit ?? 0) / prevMonthData!.totalInvestmentSold! 
             : 0;
 
+        const currentMonthInvestment = (currentMonthData?.totalInvestment ?? 0) + (currentMonthData?.totalOtherCosts ?? 0);
+        const prevMonthInvestment = (prevMonthData?.totalInvestment ?? 0) + (prevMonthData?.totalOtherCosts ?? 0);
 
         return {
             revenue: calculateChange(currentMonthData?.totalRevenue, prevMonthData?.totalRevenue),
             profit: calculateChange(currentMonthData?.totalProfit, prevMonthData?.totalProfit),
-            investment: calculateChange(currentMonthData?.totalInvestment, prevMonthData?.totalInvestment),
+            investment: calculateChange(currentMonthInvestment, prevMonthInvestment),
             itemsSold: calculateChange(currentMonthData?.totalItemsSold, prevMonthData?.totalItemsSold),
             avgMargin: calculateChange(currentAvgMargin, prevAvgMargin),
         };
@@ -159,9 +161,11 @@ export default function DashboardPage() {
         const totalProfit = userProfile.totalProfit ?? 0;
         const totalItemsSold = userProfile.totalItemsSold ?? 0;
         const itemsInStock = userProfile.itemsInStock ?? 0;
+        const totalInvestmentInStock = userProfile.totalInvestment ?? 0;
         const totalInvestmentSold = userProfile.totalInvestmentSold ?? 0;
+        const totalOtherCosts = userProfile.totalOtherCosts ?? 0;
+        const totalInvestment = totalInvestmentInStock + totalInvestmentSold + totalOtherCosts;
         const totalRevenue = userProfile.totalRevenue ?? 0;
-        const totalInvestment = userProfile.totalInvestment ?? 0;
         
         const averageProfitMargin = totalInvestmentSold > 0
             ? totalProfit / totalInvestmentSold
@@ -184,7 +188,7 @@ export default function DashboardPage() {
     });
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
+        <div className="min-h-screen text-white">
             <div className="max-w-[1800px] mx-auto p-4 md:p-8 space-y-6">
                 
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
@@ -216,7 +220,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
+                    <div className="group relative bg-slate-900/50 border border-slate-800 
                                   rounded-3xl p-4 md:p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
                         <div className="relative">
@@ -238,7 +242,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 
+                    <div className="group relative bg-slate-900/50 border border-slate-800 
                                   rounded-3xl p-4 md:p-6 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl" />
                         <div className="relative">
@@ -262,7 +266,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mt-6">
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                    <div className="group relative bg-slate-900/50 border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-3xl" />
                         <div className="relative">
                             <div className="flex items-center justify-between mb-3">
@@ -280,7 +284,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                    <div className="group relative bg-slate-900/50 border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/20 rounded-full blur-3xl" />
                         <div className="relative">
                             <div className="flex items-center justify-between mb-3">
@@ -296,7 +300,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                    <div className="group relative bg-slate-900/50 border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/20 rounded-full blur-3xl" />
                         <div className="relative">
                             <div className="flex items-center justify-between mb-3">
@@ -311,7 +315,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
+                    <div className="group relative bg-slate-900/50 border border-slate-800 rounded-3xl p-4 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/20 rounded-full blur-3xl" />
                         <div className="relative">
                             <div className="flex items-center justify-between mb-3">
@@ -331,7 +335,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                    <div className="xl:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+                    <div className="xl:col-span-2 bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden">
                         <div className="p-4 md:p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
                                 <h3 className="text-xl font-bold mb-1">Análise de Performance</h3>
@@ -352,7 +356,7 @@ export default function DashboardPage() {
                     <div className="space-y-6">
                         <InfoCarouselCard />
 
-                        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+                        <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden">
                             <div className="p-4 md:p-6 border-b border-slate-800">
                                 <div className="flex items-center justify-between">
                                     <div>
