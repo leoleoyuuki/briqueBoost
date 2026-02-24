@@ -66,11 +66,8 @@ service cloud.firestore {
      * Enforces that a specific field is immutable and cannot be changed during an update.
      */
     function isImmutable(field) {
-      // Allow the field to be set on creation
-      if (resource == null) {
-        return true;
-      }
-      return request.resource.data[field] == resource.data[field];
+      // Allow the field to be set on creation, otherwise check for equality.
+      return resource == null || request.resource.data[field] == resource.data[field];
     }
 
     /**
@@ -182,8 +179,7 @@ service cloud.firestore {
        * @principle Enforces strict data ownership for private user expenses.
        */
       match /otherCosts/{costId} {
-        allow get, delete: if isOwner(userId);
-        allow list: if isOwner(userId);
+        allow get, list, delete: if isOwner(userId);
         allow create: if isOwner(userId) && hasValidOtherCostData(userId, costId);
         allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
       }
