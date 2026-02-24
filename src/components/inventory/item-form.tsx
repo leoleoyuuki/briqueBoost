@@ -38,12 +38,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { HelpCircle, Trash2 } from 'lucide-react';
 
 interface ItemFormProps {
@@ -132,7 +126,7 @@ export function ItemForm({ item }: ItemFormProps) {
                 enhancedTitle: null,
                 enhancedDescription: null,
                 reasoning: null,
-                dateSold: null,
+                saleDate: null,
                 platform: '',
                 imageHint: null,
             };
@@ -180,51 +174,75 @@ export function ItemForm({ item }: ItemFormProps) {
   const handleDeleteItem = async () => {
     if (!user || !item) return;
 
-    if (item.status === 'Sold') {
-        toast({
-            variant: 'destructive',
-            title: 'Ação não permitida',
-            description: 'Não é possível excluir um item que já foi vendido.'
-        });
-        return;
-    }
-
     setIsDeleting(true);
     const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
     const userRef = doc(firestore, 'users', user.uid);
-
-    const conditionField = getConditionStockField(item.condition);
-    const userUpdate: { [key: string]: any } = {
-        itemsInStock: increment(-1),
-        totalInvestment: increment(-item.purchasePrice),
-    };
-    if (conditionField) {
-        userUpdate[conditionField] = increment(-1);
-    }
-    
-    let summaryRef;
-    let summaryUpdate;
-    if (item.purchaseDate?.toDate) {
-        const purchaseDate = item.purchaseDate.toDate();
-        const purchaseMonthId = format(purchaseDate, 'yyyy-MM');
-        summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', purchaseMonthId);
-        summaryUpdate = {
-            totalInvestment: increment(-item.purchasePrice),
-        };
-    }
-
     const batch = writeBatch(firestore);
-    batch.delete(itemRef);
-    batch.update(userRef, userUpdate);
-    if (summaryRef && summaryUpdate) {
-        batch.update(summaryRef, summaryUpdate);
-    }
 
     try {
+        if (item.status === 'Sold') {
+            if (!item.salePrice || !item.saleDate) {
+                 toast({
+                    variant: 'destructive',
+                    title: 'Dados Incompletos',
+                    description: 'Não é possível excluir um item vendido sem preço ou data de venda.',
+                });
+                setIsDeleting(false);
+                return;
+            }
+
+            const salePrice = item.salePrice || 0;
+            const profit = item.profit || 0;
+
+            // Reverse user totals
+            batch.update(userRef, {
+                totalItemsSold: increment(-1),
+                totalProfit: increment(-profit),
+                totalInvestmentSold: increment(-item.purchasePrice),
+                totalRevenue: increment(-salePrice),
+            });
+
+            // Reverse monthly summary for sale month
+            if (item.saleDate?.toDate) {
+                const saleDate = item.saleDate.toDate();
+                const saleMonthId = format(saleDate, 'yyyy-MM');
+                const summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', saleMonthId);
+                batch.update(summaryRef, {
+                    totalItemsSold: increment(-1),
+                    totalProfit: increment(-profit),
+                    totalRevenue: increment(-salePrice),
+                    totalInvestmentSold: increment(-item.purchasePrice),
+                });
+            }
+        } else { // 'In Stock'
+            const conditionField = getConditionStockField(item.condition);
+            const userUpdate: { [key: string]: any } = {
+                itemsInStock: increment(-1),
+                totalInvestment: increment(-item.purchasePrice),
+            };
+            if (conditionField) {
+                userUpdate[conditionField] = increment(-1);
+            }
+            batch.update(userRef, userUpdate);
+
+            // Reverse monthly summary for purchase month
+            if (item.purchaseDate?.toDate) {
+                const purchaseDate = item.purchaseDate.toDate();
+                const purchaseMonthId = format(purchaseDate, 'yyyy-MM');
+                const summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', purchaseMonthId);
+                batch.update(summaryRef, {
+                    totalInvestment: increment(-item.purchasePrice),
+                });
+            }
+        }
+
+        // Delete the item itself
+        batch.delete(itemRef);
+
         await batch.commit();
         toast({
             title: 'Item excluído!',
-            description: 'O item foi removido permanentemente do seu inventário.',
+            description: 'O item foi removido permanentemente.',
         });
         router.push('/inventory');
     } catch (error) {
@@ -333,48 +351,31 @@ export function ItemForm({ item }: ItemFormProps) {
         <div className="p-6 md:p-8 flex justify-between items-center gap-3 border-t border-slate-800">
           <div>
             {item && (
-                <>
-                {item.status === 'Sold' ? (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <span tabIndex={0}>
-                                    <Button variant="ghost" type="button" className="text-red-500/80 rounded-xl px-4 py-2" disabled>
-                                        <Trash2 className="h-4 w-4 mr-2"/>
-                                        Excluir
-                                    </Button>
-                                </span>
-                            </TooltipTrigger>
-                            <TooltipContent className="bg-slate-900 border-slate-800 text-slate-300">
-                                <p>Itens vendidos não podem ser excluídos.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                ) : (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" type="button" className="text-red-500/80 hover:text-red-500 hover:bg-red-500/10 rounded-xl px-4 py-2" disabled={isDeleting}>
-                              <Trash2 className="h-4 w-4 mr-2"/>
-                              Excluir
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-slate-900 border-slate-800">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                <AlertDialogDescription className="text-slate-400">
-                                    Esta ação não pode ser desfeita. Isso excluirá permanentemente o item do seu inventário e ajustará suas estatísticas financeiras.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDeleteItem} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
-                                    {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
-                </>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" type="button" className="text-red-500/80 hover:text-red-500 hover:bg-red-500/10 rounded-xl px-4 py-2" disabled={isDeleting}>
+                          <Trash2 className="h-4 w-4 mr-2"/>
+                          Excluir
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-slate-900 border-slate-800">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-slate-400">
+                                {item.status === 'Sold'
+                                    ? 'Esta ação não pode ser desfeita. Excluir um item vendido reverterá o lucro, a receita e as contagens de vendas associadas nos seus relatórios, afetando seus dados históricos.'
+                                    : 'Esta ação não pode ser desfeita. Isso excluirá permanentemente o item e ajustará seus totais de investimento e estoque.'
+                                }
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteItem} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
+                                {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             )}
           </div>
           <div className="flex justify-end gap-3">

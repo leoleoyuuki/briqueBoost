@@ -15,7 +15,7 @@ export type Item = {
   enhancedTitle: string | null;
   enhancedDescription: string | null;
   reasoning: string | null;
-  dateSold: any | null; // Can be Timestamp from Firebase
+  saleDate: any | null; // Can be Timestamp from Firebase
   platform: string;
   imageUrl: string | null;
   imageHint: string | null;

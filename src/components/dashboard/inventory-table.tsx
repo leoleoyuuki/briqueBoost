@@ -30,12 +30,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Inbox, Dot, Package, Trash2, Edit } from "lucide-react";
 
 
@@ -89,53 +83,76 @@ export function InventoryTable({
 
   const handleDeleteItem = async (item: Item) => {
     if (!user) return;
-    
-    if (item.status === 'Sold') {
-        toast({
-            variant: 'destructive',
-            title: 'Ação não permitida',
-            description: 'Itens vendidos não podem ser excluídos.',
-        });
-        return;
-    }
-
     setIsDeleting(true);
 
     const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
     const userRef = doc(firestore, 'users', user.uid);
-
-    const conditionField = getConditionStockField(item.condition);
-    const userUpdate: { [key: string]: any } = {
-        itemsInStock: increment(-1),
-        totalInvestment: increment(-item.purchasePrice),
-    };
-    if (conditionField) {
-        userUpdate[conditionField] = increment(-1);
-    }
-    
-    let summaryRef;
-    let summaryUpdate;
-    if (item.purchaseDate?.toDate) {
-        const purchaseDate = item.purchaseDate.toDate();
-        const purchaseMonthId = format(purchaseDate, 'yyyy-MM');
-        summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', purchaseMonthId);
-        summaryUpdate = {
-            totalInvestment: increment(-item.purchasePrice),
-        };
-    }
-
     const batch = writeBatch(firestore);
-    batch.delete(itemRef);
-    batch.update(userRef, userUpdate);
-    if (summaryRef && summaryUpdate) {
-        batch.update(summaryRef, summaryUpdate);
-    }
 
     try {
+        if (item.status === 'Sold') {
+            if (!item.salePrice || !item.saleDate) {
+                 toast({
+                    variant: 'destructive',
+                    title: 'Dados Incompletos',
+                    description: 'Não é possível excluir um item vendido sem preço ou data de venda.',
+                });
+                setIsDeleting(false);
+                return;
+            }
+
+            const salePrice = item.salePrice || 0;
+            const profit = item.profit || 0;
+
+            // Reverse user totals
+            batch.update(userRef, {
+                totalItemsSold: increment(-1),
+                totalProfit: increment(-profit),
+                totalInvestmentSold: increment(-item.purchasePrice),
+                totalRevenue: increment(-salePrice),
+            });
+
+            // Reverse monthly summary for sale month
+            if (item.saleDate?.toDate) {
+                const saleDate = item.saleDate.toDate();
+                const saleMonthId = format(saleDate, 'yyyy-MM');
+                const summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', saleMonthId);
+                batch.update(summaryRef, {
+                    totalItemsSold: increment(-1),
+                    totalProfit: increment(-profit),
+                    totalRevenue: increment(-salePrice),
+                    totalInvestmentSold: increment(-item.purchasePrice),
+                });
+            }
+        } else { // 'In Stock'
+            const conditionField = getConditionStockField(item.condition);
+            const userUpdate: { [key: string]: any } = {
+                itemsInStock: increment(-1),
+                totalInvestment: increment(-item.purchasePrice),
+            };
+            if (conditionField) {
+                userUpdate[conditionField] = increment(-1);
+            }
+            batch.update(userRef, userUpdate);
+
+            // Reverse monthly summary for purchase month
+            if (item.purchaseDate?.toDate) {
+                const purchaseDate = item.purchaseDate.toDate();
+                const purchaseMonthId = format(purchaseDate, 'yyyy-MM');
+                const summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', purchaseMonthId);
+                batch.update(summaryRef, {
+                    totalInvestment: increment(-item.purchasePrice),
+                });
+            }
+        }
+
+        // Delete the item itself
+        batch.delete(itemRef);
+
         await batch.commit();
         toast({
             title: 'Item excluído!',
-            description: 'O item foi removido permanentemente do seu inventário.',
+            description: 'O item foi removido permanentemente.',
         });
     } catch (error) {
         console.error("Error deleting item:", error);
@@ -224,47 +241,30 @@ export function InventoryTable({
                                         </Button>
                                     </Link>
                                     
-                                    {item.status === 'Sold' ? (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span tabIndex={0}>
-                                                        <Button aria-label="Excluir Item" size="icon" variant="ghost"
-                                                            className="text-red-500/70 rounded-lg h-8 w-8"
-                                                            disabled>
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </span>
-                                                </TooltipTrigger>
-                                                <TooltipContent className="bg-slate-900 border-slate-800 text-slate-300">
-                                                    <p>Itens vendidos não podem ser excluídos.</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    ) : (
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button aria-label="Excluir Item" size="icon" variant="ghost"
-                                                    className="text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg h-8 w-8">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent className="bg-slate-900 border-slate-800">
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                                    <AlertDialogDescription className="text-slate-400">
-                                                        Esta ação não pode ser desfeita. Isso excluirá permanentemente o item.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDeleteItem(item)} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
-                                                        {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    )}
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button aria-label="Excluir Item" size="icon" variant="ghost"
+                                                className="text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg h-8 w-8">
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent className="bg-slate-900 border-slate-800">
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                                <AlertDialogDescription className="text-slate-400">
+                                                    {item.status === 'Sold'
+                                                        ? 'Esta ação não pode ser desfeita. Excluir um item vendido reverterá o lucro, a receita e as contagens de vendas associadas nos seus relatórios, afetando seus dados históricos.'
+                                                        : 'Esta ação não pode ser desfeita. Isso excluirá permanentemente o item e ajustará seus totais de investimento e estoque.'}
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDeleteItem(item)} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
+                                                    {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </TableCell>
                         </TableRow>
