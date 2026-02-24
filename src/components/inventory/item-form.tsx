@@ -38,6 +38,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { HelpCircle, Trash2 } from 'lucide-react';
 
 interface ItemFormProps {
@@ -327,28 +333,48 @@ export function ItemForm({ item }: ItemFormProps) {
         <div className="p-6 md:p-8 flex justify-between items-center gap-3 border-t border-slate-800">
           <div>
             {item && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" type="button" className="text-red-500/80 hover:text-red-500 hover:bg-red-500/10 rounded-xl px-4 py-2" disabled={item.status === 'Sold' || isDeleting}>
-                      <Trash2 className="h-4 w-4 mr-2"/>
-                      Excluir
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="bg-slate-900 border-slate-800">
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-400">
-                            Esta ação não pode ser desfeita. Isso excluirá permanentemente o item do seu inventário e ajustará suas estatísticas financeiras.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteItem} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
-                            {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                <>
+                {item.status === 'Sold' ? (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span tabIndex={0}>
+                                    <Button variant="ghost" type="button" className="text-red-500/80 rounded-xl px-4 py-2" disabled>
+                                        <Trash2 className="h-4 w-4 mr-2"/>
+                                        Excluir
+                                    </Button>
+                                </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="bg-slate-900 border-slate-800 text-slate-300">
+                                <p>Itens vendidos não podem ser excluídos.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                ) : (
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" type="button" className="text-red-500/80 hover:text-red-500 hover:bg-red-500/10 rounded-xl px-4 py-2" disabled={isDeleting}>
+                              <Trash2 className="h-4 w-4 mr-2"/>
+                              Excluir
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-slate-900 border-slate-800">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-slate-400">
+                                    Esta ação não pode ser desfeita. Isso excluirá permanentemente o item do seu inventário e ajustará suas estatísticas financeiras.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDeleteItem} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
+                                    {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
+                </>
             )}
           </div>
           <div className="flex justify-end gap-3">

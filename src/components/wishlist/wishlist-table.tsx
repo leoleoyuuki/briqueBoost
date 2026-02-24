@@ -17,6 +17,17 @@ import { Button } from "../ui/button";
 import { useFirestore, useUser, updateDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const formatDate = (date: any) => {
   if (!date) return '-';
@@ -115,11 +126,26 @@ export function WishlistTable({ items, isLoading }: WishlistTableProps) {
                                              <Archive className="h-4 w-4" />
                                          </Button>
                                     )}
-                                    <Button aria-label="Deletar Item" size="icon" variant="ghost"
-                                        className="text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg"
-                                        onClick={() => handleDelete(item.id)}>
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button aria-label="Deletar Item" size="icon" variant="ghost"
+                                                className="text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg">
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent className="bg-slate-900 border-slate-800">
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                                <AlertDialogDescription className="text-slate-400">
+                                                    Esta ação removerá permanentemente este item da sua lista de desejos.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(item.id)} className="bg-red-600 hover:bg-red-500">Excluir</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </TableCell>
                             </TableRow>
                         )
