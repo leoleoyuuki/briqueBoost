@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { doc, writeBatch, increment } from 'firebase/firestore';
 import { useUser, useFirestore } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
@@ -76,6 +77,7 @@ export function InventoryTable({
     onPrevPage,
 }: InventoryTableProps) {
   
+  const router = useRouter();
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -198,9 +200,9 @@ export function InventoryTable({
                 </TableHeader>
                 <TableBody>
                     {items.map((item) => (
-                        <TableRow key={item.id} className="border-slate-800">
+                        <TableRow key={item.id} className="border-slate-800 cursor-pointer" onClick={() => router.push(`/inventory/${item.id}`)}>
                             <TableCell>
-                                <Link href={`/inventory/${item.id}`} className="flex items-center gap-3 group">
+                                <div className="flex items-center gap-3">
                                     {item.imageUrl ? (
                                         <Image
                                             alt={item.name}
@@ -214,8 +216,8 @@ export function InventoryTable({
                                             <Package className="h-5 w-5 text-slate-500" />
                                         </div>
                                     )}
-                                    <div className='font-medium text-white group-hover:text-blue-400 transition-colors'>{item.name}</div>
-                                </Link>
+                                    <div className='font-medium text-white'>{item.name}</div>
+                                </div>
                             </TableCell>
                             <TableCell className="hidden sm:table-cell text-slate-400">{formatCurrency(item.purchasePrice)}</TableCell>
                             <TableCell className="hidden md:table-cell text-slate-400">{formatDate(item.purchaseDate)}</TableCell>
@@ -233,7 +235,7 @@ export function InventoryTable({
                                 </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                                <div className="flex items-center justify-end gap-2">
+                                <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                                     <Link href={`/inventory/${item.id}/edit`} passHref>
                                         <Button aria-label="Editar Item" size="icon" variant="ghost"
                                         className="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg h-8 w-8">

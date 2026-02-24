@@ -66,8 +66,6 @@ export function ItemForm({ item }: ItemFormProps) {
     purchasePrice: item?.purchasePrice ?? '',
     condition: item?.condition ?? '',
     source: item?.source ?? '',
-    initialTitle: item?.initialTitle ?? '',
-    initialDescription: item?.initialDescription ?? '',
     imageUrl: item?.imageUrl ?? '',
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -90,35 +88,37 @@ export function ItemForm({ item }: ItemFormProps) {
     };
     setIsLoading(true);
 
-    const commonData = {
-        name: formData.name,
-        purchasePrice: parseFloat(String(formData.purchasePrice)),
-        condition: formData.condition,
-        source: formData.source,
-        initialTitle: formData.initialTitle,
-        initialDescription:formData.initialDescription,
-        imageUrl: formData.imageUrl || null,
-    };
-    
     try {
         if (item) {
             // Update existing item
             const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
-            // Note: If condition changes, we should adjust counters. This is a more complex scenario.
-            // For now, we assume condition is not editable or handle it separately.
-            updateDocumentNonBlocking(itemRef, commonData);
+            const updateData = {
+                name: formData.name,
+                purchasePrice: parseFloat(String(formData.purchasePrice)),
+                condition: formData.condition,
+                source: formData.source,
+                initialTitle: formData.name, // Keep title in sync with name
+                imageUrl: formData.imageUrl || null,
+            };
+            updateDocumentNonBlocking(itemRef, updateData);
             toast({ title: 'Item atualizado com sucesso!'});
             router.push(`/inventory/${item.id}`);
         } else {
             // Add new item
             const itemsCollection = collection(firestore, 'users', user.uid, 'items');
-            const newDocRef = doc(itemsCollection); // Create ref with new ID
+            const newDocRef = doc(itemsCollection);
             const userRef = doc(firestore, 'users', user.uid);
             const purchasePrice = parseFloat(String(formData.purchasePrice));
 
             const newItemData = {
-                ...commonData,
-                id: newDocRef.id, // Add ID to document data
+                name: formData.name,
+                purchasePrice: purchasePrice,
+                condition: formData.condition,
+                source: formData.source,
+                initialTitle: formData.name, // Set initial title from name
+                initialDescription: '', // Set initial description to empty
+                imageUrl: formData.imageUrl || null,
+                id: newDocRef.id,
                 userId: user.uid,
                 purchaseDate: serverTimestamp(),
                 status: 'In Stock' as const,
@@ -149,7 +149,6 @@ export function ItemForm({ item }: ItemFormProps) {
                 year: purchaseDate.getFullYear(),
                 month: purchaseDate.getMonth() + 1,
                 totalInvestment: increment(purchasePrice),
-                // Initialize other fields to ensure they can be incremented later
                 totalProfit: increment(0),
                 totalItemsSold: increment(0),
                 totalRevenue: increment(0),
@@ -334,18 +333,6 @@ export function ItemForm({ item }: ItemFormProps) {
             </div>
             <Input id="imageUrl" name="imageUrl" placeholder="Cole o link da imagem do anúncio" value={formData.imageUrl ?? ''} onChange={handleChange} 
                    className={inputStyle} />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="initialTitle" className="text-slate-400">Título Inicial do Anúncio</Label>
-            <Input id="initialTitle" name="initialTitle" placeholder="O título que você usaria" value={formData.initialTitle} onChange={handleChange} 
-                   className={inputStyle} />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="initialDescription" className="text-slate-400">Descrição Inicial do Anúncio</Label>
-            <Textarea id="initialDescription" name="initialDescription" placeholder="Descreva o item, seus detalhes e condição." value={formData.initialDescription} onChange={handleChange} 
-                      className={`${inputStyle} min-h-[100px]`} />
           </div>
         </div>
         <div className="p-6 md:p-8 flex justify-between items-center gap-3 border-t border-slate-800">
