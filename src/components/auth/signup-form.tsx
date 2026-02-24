@@ -72,7 +72,7 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSignup}>
-      <Card className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl border-slate-800 rounded-3xl">
+      <Card className="w-full max-w-md bg-slate-900/50 border-slate-800 rounded-3xl">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl text-slate-100">Crie sua conta</CardTitle>
           <CardDescription className="text-slate-400">É rápido e fácil. Vamos começar!</CardDescription>

@@ -30,7 +30,7 @@ export default function EditItemPage() {
 
   const renderSkeleton = () => (
     <div>
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-8">
+        <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8">
             <div className="grid gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Skeleton className="h-12 w-full bg-slate-800 rounded-xl" />

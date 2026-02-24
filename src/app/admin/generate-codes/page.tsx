@@ -128,7 +128,7 @@ export default function GenerateCodesPage() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl">
+            <div className="bg-slate-900/50 border border-slate-800 rounded-3xl">
                 <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-bold text-white">Gerador de Códigos de Ativação</h2>

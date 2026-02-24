@@ -13,7 +13,7 @@ export default function SupportPage() {
 
     return (
         <div className="flex justify-center items-start pt-10">
-            <Card className="w-full max-w-2xl bg-slate-900/50 backdrop-blur-xl border-slate-800 rounded-3xl">
+            <Card className="w-full max-w-2xl bg-slate-900/50 border-slate-800 rounded-3xl">
                 <CardHeader className="text-center items-center">
                     <div className="bg-blue-500/10 p-4 rounded-full mb-4">
                         <LifeBuoy className="h-10 w-10 text-blue-400" />

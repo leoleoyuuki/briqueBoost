@@ -210,7 +210,7 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
   const profit = item.status === 'Sold' && item.salePrice ? item.salePrice - item.purchasePrice : null;
 
   return (
-    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+    <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden">
         <div className="p-6 border-b border-slate-800">
             <div className="flex items-start justify-between gap-4">
               <div>

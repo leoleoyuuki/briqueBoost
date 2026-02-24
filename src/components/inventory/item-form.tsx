@@ -243,7 +243,7 @@ export function ItemForm({ item }: ItemFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl">
+      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl">
         <div className="p-6 md:p-8 border-b border-slate-800">
           <h2 className="font-headline text-xl font-bold text-white">{item ? 'Editar Item' : 'Adicionar Novo Item'}</h2>
           <p className="text-slate-400 mt-1">

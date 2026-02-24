@@ -371,7 +371,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden">
+                <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden">
                     
                     <div className="p-4 md:p-6 border-b border-slate-800">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">

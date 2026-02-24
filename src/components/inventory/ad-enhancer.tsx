@@ -144,7 +144,7 @@ export function AdEnhancer({ item }: { item: WithId<Item> }) {
   const canUseAi = (userProfile?.aiUsageCount ?? 0) < aiLimit;
 
   return (
-    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl">
+    <div className="bg-slate-900/50 border border-slate-800 rounded-3xl">
       <div className="p-6">
         <div className="flex items-center gap-3">
             <Sparkles className="h-6 w-6 text-blue-400" />

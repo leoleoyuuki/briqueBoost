@@ -107,7 +107,7 @@ export function ActivationForm({ isExpired }: ActivationFormProps) {
     const whatsappLink = "https://wa.me/5511957211546?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20um%20c%C3%B3digo%20de%20ativa%C3%A7%C3%A3o%20para%20o%20BriqueBoost.";
 
     return (
-        <div className="flex flex-col items-center justify-center p-4 md:p-8 text-center bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl max-w-2xl mx-auto">
+        <div className="flex flex-col items-center justify-center p-4 md:p-8 text-center bg-slate-900/50 border border-slate-800 rounded-3xl max-w-2xl mx-auto">
             <div className="bg-blue-500/10 p-4 rounded-full mb-6">
                 <KeyRound className="h-10 w-10 text-blue-400" />
             </div>
