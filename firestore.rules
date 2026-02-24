@@ -40,6 +40,13 @@ service cloud.firestore {
     }
 
     /**
+     * Checks if the request is from the admin user.
+     */
+    function isAdmin() {
+      return request.auth.uid == 'jkpKhUbIIiSiy2yZdgYxWMzv7xF3';
+    }
+
+    /**
      * Checks if the currently authenticated user is the owner of the resource
      * based on the userId provided in the document path.
      */
@@ -168,12 +175,8 @@ service cloud.firestore {
      * @deny (delete) No one can delete codes.
      */
     match /activationCodes/{codeId} {
-      function isAdmin() {
-        return request.auth.uid == 'jkpKhUbIIiSiy2yZdgYxWMzv7xF3';
-      }
-
       allow get: if isSignedIn();
-      allow list: if isAdmin();
+      allow list, delete: if isAdmin();
       allow create: if isAdmin() && request.resource.data.id == codeId;
       
       // Allow a user to claim an unused code
@@ -184,8 +187,6 @@ service cloud.firestore {
                     && request.resource.data.usedBy == request.auth.uid
                     // Ensure no other fields are being changed except the 'used' ones
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isUsed', 'usedBy', 'usedAt']);
-
-      allow delete: if isAdmin();
     }
   }
 }
