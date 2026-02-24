@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser, useFirestore, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
-import { collection, doc, serverTimestamp, increment } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, increment, writeBatch } from 'firebase/firestore';
 import type { Item, WithId } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
@@ -27,7 +27,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { HelpCircle } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { HelpCircle, Trash2 } from 'lucide-react';
 
 interface ItemFormProps {
   item?: WithId<Item>;
@@ -60,6 +71,7 @@ export function ItemForm({ item }: ItemFormProps) {
     imageUrl: item?.imageUrl ?? '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -159,6 +171,68 @@ export function ItemForm({ item }: ItemFormProps) {
     }
   };
 
+  const handleDeleteItem = async () => {
+    if (!user || !item) return;
+
+    if (item.status === 'Sold') {
+        toast({
+            variant: 'destructive',
+            title: 'Ação não permitida',
+            description: 'Não é possível excluir um item que já foi vendido.'
+        });
+        return;
+    }
+
+    setIsDeleting(true);
+    const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
+    const userRef = doc(firestore, 'users', user.uid);
+
+    const conditionField = getConditionStockField(item.condition);
+    const userUpdate: { [key: string]: any } = {
+        itemsInStock: increment(-1),
+        totalInvestment: increment(-item.purchasePrice),
+    };
+    if (conditionField) {
+        userUpdate[conditionField] = increment(-1);
+    }
+    
+    let summaryRef;
+    let summaryUpdate;
+    if (item.purchaseDate?.toDate) {
+        const purchaseDate = item.purchaseDate.toDate();
+        const purchaseMonthId = format(purchaseDate, 'yyyy-MM');
+        summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', purchaseMonthId);
+        summaryUpdate = {
+            totalInvestment: increment(-item.purchasePrice),
+        };
+    }
+
+    const batch = writeBatch(firestore);
+    batch.delete(itemRef);
+    batch.update(userRef, userUpdate);
+    if (summaryRef && summaryUpdate) {
+        batch.update(summaryRef, summaryUpdate);
+    }
+
+    try {
+        await batch.commit();
+        toast({
+            title: 'Item excluído!',
+            description: 'O item foi removido permanentemente do seu inventário.',
+        });
+        router.push('/inventory');
+    } catch (error) {
+        console.error("Error deleting item:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Erro ao excluir item',
+            description: 'Não foi possível remover o item. Tente novamente.',
+        });
+    } finally {
+        setIsDeleting(false);
+    }
+  };
+
   const inputStyle = "bg-slate-800 border-slate-700 rounded-xl h-12 text-base";
 
   return (
@@ -250,13 +324,41 @@ export function ItemForm({ item }: ItemFormProps) {
                       className={`${inputStyle} min-h-[100px]`} />
           </div>
         </div>
-        <div className="p-6 md:p-8 flex justify-end gap-3 border-t border-slate-800">
-          <Link href={item ? `/inventory/${item.id}` : '/dashboard'} passHref>
-            <Button variant="outline" type="button" className="px-6 py-3 bg-slate-800 hover:bg-slate-700 border-slate-700 text-white rounded-xl transition-all duration-200 font-medium text-sm h-auto">Cancelar</Button>
-          </Link>
-          <Button type="submit" disabled={isLoading || isAuthLoading} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all duration-200 font-medium text-sm h-auto">
-            {isLoading ? (item ? 'Salvando...' : 'Adicionando...') : (item ? 'Salvar Alterações' : 'Adicionar Item')}
-          </Button>
+        <div className="p-6 md:p-8 flex justify-between items-center gap-3 border-t border-slate-800">
+          <div>
+            {item && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" type="button" className="text-red-500/80 hover:text-red-500 hover:bg-red-500/10 rounded-xl px-4 py-2" disabled={item.status === 'Sold' || isDeleting}>
+                      <Trash2 className="h-4 w-4 mr-2"/>
+                      Excluir
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-slate-900 border-slate-800">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-400">
+                            Esta ação não pode ser desfeita. Isso excluirá permanentemente o item do seu inventário e ajustará suas estatísticas financeiras.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteItem} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
+                            {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
+          <div className="flex justify-end gap-3">
+            <Link href={item ? `/inventory/${item.id}` : '/dashboard'} passHref>
+              <Button variant="outline" type="button" className="px-6 py-3 bg-slate-800 hover:bg-slate-700 border-slate-700 text-white rounded-xl transition-all duration-200 font-medium text-sm h-auto">Cancelar</Button>
+            </Link>
+            <Button type="submit" disabled={isLoading || isAuthLoading} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all duration-200 font-medium text-sm h-auto">
+              {isLoading ? (item ? 'Salvando...' : 'Adicionando...') : (item ? 'Salvar Alterações' : 'Adicionar Item')}
+            </Button>
+          </div>
         </div>
       </div>
     </form>
