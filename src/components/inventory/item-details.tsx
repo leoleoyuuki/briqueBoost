@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { Item, WithId } from "@/lib/types";
 import { useUser, useFirestore, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
-import { doc, serverTimestamp, increment } from 'firebase/firestore';
+import { doc, serverTimestamp, increment, writeBatch } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -13,13 +14,24 @@ import {
   CardTitle,
   CardFooter
 } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Dot, ImageIcon } from 'lucide-react';
+import { Pencil, Dot, ImageIcon, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 const formatCurrency = (value: number | null | undefined) => {
@@ -59,8 +71,10 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const router = useRouter();
   const [salePrice, setSalePrice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const handleConfirmSale = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -128,6 +142,71 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
       }
   };
 
+  const handleDeleteItem = async () => {
+    if (!user) return;
+
+    if (item.status === 'Sold') {
+        toast({
+            variant: 'destructive',
+            title: 'Ação não permitida',
+            description: 'Não é possível excluir um item que já foi vendido.'
+        });
+        return;
+    }
+
+    setIsDeleting(true);
+    const itemRef = doc(firestore, 'users', user.uid, 'items', item.id);
+    const userRef = doc(firestore, 'users', user.uid);
+
+    const conditionField = getConditionStockField(item.condition);
+    const userUpdate: { [key: string]: any } = {
+        itemsInStock: increment(-1),
+        totalInvestment: increment(-item.purchasePrice),
+    };
+    if (conditionField) {
+        userUpdate[conditionField] = increment(-1);
+    }
+    
+    // Reverse monthly summary stats for investment
+    let summaryRef;
+    let summaryUpdate;
+    if (item.purchaseDate?.toDate) {
+        const purchaseDate = item.purchaseDate.toDate();
+        const purchaseMonthId = format(purchaseDate, 'yyyy-MM');
+        summaryRef = doc(firestore, 'users', user.uid, 'monthlySummaries', purchaseMonthId);
+        summaryUpdate = {
+            totalInvestment: increment(-item.purchasePrice),
+        };
+    }
+
+    const batch = writeBatch(firestore);
+    batch.delete(itemRef);
+    batch.update(userRef, userUpdate);
+    if (summaryRef && summaryUpdate) {
+        batch.update(summaryRef, summaryUpdate);
+    }
+
+    try {
+        await batch.commit();
+        toast({
+            title: 'Item excluído!',
+            description: 'O item foi removido permanentemente do seu inventário.',
+        });
+        router.push('/inventory');
+    } catch (error) {
+        console.error("Error deleting item:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Erro ao excluir item',
+            description: 'Não foi possível atualizar os totais. O item foi excluído, mas pode haver inconsistências nos relatórios.',
+        });
+        // still redirect even if totals fail to update
+        router.push('/inventory');
+    } finally {
+        setIsDeleting(false);
+    }
+  };
+
   const profit = item.status === 'Sold' && item.salePrice ? item.salePrice - item.purchasePrice : null;
 
   return (
@@ -138,11 +217,35 @@ export function ItemDetails({ item }: { item: WithId<Item> }) {
                 <h2 className="font-headline text-xl font-bold text-white">{item.name}</h2>
                 <p className="text-slate-400">{item.initialTitle}</p>
               </div>
-              <Link href={`/inventory/${item.id}/edit`} passHref>
-                <Button variant="outline" size="icon" aria-label="Editar item" className="bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl">
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href={`/inventory/${item.id}/edit`} passHref>
+                    <Button variant="outline" size="icon" aria-label="Editar item" className="bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl">
+                        <Pencil className="h-4 w-4" />
+                    </Button>
+                </Link>
+
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="icon" aria-label="Excluir item" className="bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl" disabled={item.status === 'Sold'}>
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-slate-900 border-slate-800">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-slate-400">
+                                Esta ação não pode ser desfeita. Isso excluirá permanentemente o item do seu inventário e ajustará suas estatísticas financeiras. Itens vendidos não podem ser excluídos.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-transparent text-white hover:bg-slate-800 border-slate-700">Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteItem} disabled={isDeleting} className="bg-red-600 hover:bg-red-500">
+                                {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
         </div>
         <div className="p-6 space-y-6">
