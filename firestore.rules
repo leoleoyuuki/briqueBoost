@@ -182,7 +182,8 @@ service cloud.firestore {
        * @principle Enforces strict data ownership for private user expenses.
        */
       match /otherCosts/{costId} {
-        allow get, list, delete: if isOwner(userId);
+        allow get, delete: if isOwner(userId);
+        allow list: if isOwner(userId);
         allow create: if isOwner(userId) && hasValidOtherCostData(userId, costId);
         allow update: if isExistingOwner(userId) && isImmutable('id') && isImmutable('userId');
       }
@@ -212,5 +213,3 @@ service cloud.firestore {
     }
   }
 }
-
-    
