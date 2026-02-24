@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const ADMIN_UID = 'nccUQWtsTsRmnFXPn3HnMZ4R9ch1';
+const ADMIN_UID = 'jkpKhUbIIiSiy2yZdgYxWMzv7xF3';
 
 export default function AdminLayout({
   children,

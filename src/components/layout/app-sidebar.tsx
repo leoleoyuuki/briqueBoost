@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase';
 import { Separator } from '@/components/ui/separator';
 
-const ADMIN_UID = 'nccUQWtsTsRmnFXPn3HnMZ4R9ch1';
+const ADMIN_UID = 'jkpKhUbIIiSiy2yZdgYxWMzv7xF3';
 
 export function AppSidebar() {
   const pathname = usePathname();
